@@ -12,16 +12,32 @@ stopwordsList = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "y
                  "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", 
                  "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
 
+
 # def tokenize(filePath, bufferSize=1024):
 #     pattern = re.compile(r"\b\w+(?:'\w+)?\b")
 #     tokens = []
+#     partial_token = ''
 
 #     with open(filePath, 'r', encoding='utf-8') as file:
-#         buffer = file.read(bufferSize)
-#         while buffer:
-#             tokens.append(pattern.findall(buffer))
+#         while True:
 #             buffer = file.read(bufferSize)
-        
+#             if not buffer:
+#                 break
+
+#             buffer = partial_token + buffer.lower()
+#             found_tokens = pattern.findall(buffer)
+            
+#             # if the buffer ends with an alphanumeric character, the last token might be incomplete
+#             if buffer[-1].isalnum():
+#                 partial_token = found_tokens.pop() if found_tokens else ''
+#             else:
+#                 partial_token = ''
+            
+#             tokens.extend(found_tokens)
+    
+#     if partial_token:
+#         tokens.append(partial_token)
+
 #     return tokens
 
 def tokenize(filePath):
@@ -29,7 +45,15 @@ def tokenize(filePath):
     tokens = []
 
     with open(filePath, 'r', encoding='utf-8') as file:
+        content = file.read().lower()
+        tokens = pattern.findall(content)
 
+    filteredTokens = []
+    for token in tokens:
+        if token not in stopwordsList and len(token) > 1:
+            filteredTokens.append(token)
+
+    return filteredTokens
 
 def computeTokenFreq(tokensList):
     freqMap = {}
@@ -41,14 +65,17 @@ def computeTokenFreq(tokensList):
 
     alphabeticalSort = sorted(freqMap.items(), key=lambda x: x[0]) # sort by key
     sortedFreqMap = dict(sorted(alphabeticalSort, key=lambda x: x[1], reverse=True)) # sort by value
+
+    return sortedFreqMap
     
+
 def printFrequencies(frequencyMap):
     for token, frequency in frequencyMap.items():
         print(f"{token}: {frequency}")
 
+
 if __name__ == "__main__":
+    # Testing
     tokens1 = tokenize('Medical-Search-Engine\RomeoJuliet.txt')
-    # tokens1map = computeTokenFreq(tokens1)
-    # printFrequencies(tokens1map)
-    for tokens in tokens1:
-        print(tokens)
+    tokens1map = computeTokenFreq(tokens1)
+    printFrequencies(tokens1map)
