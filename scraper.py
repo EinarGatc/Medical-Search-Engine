@@ -1,7 +1,7 @@
 import queue
 visitedUrls = set()
 contentHashes = dict()
-valid_domains = [
+validDomains = [
     "medlineplus.gov",
     "ncbi.nlm.nih.gov",
     "cdc.gov",
@@ -12,17 +12,19 @@ valid_domains = [
     "ahrq.gov"
 ]
 
-def run_scraper(loadState=False, saveFile) -> None:
+def run_scraper(loadState=False, saveFile="crawlerState.txt") -> None:
     frontier = instantiate_frontier(loadState)
 
     while not frontier.empty():
         # Get Frontier
         new_url = frontier.get()
 
-
         # Check Content
+
         # Extract Links
+
         # Validate URL
+
         # Add URLs to Frontier
 
     pass
