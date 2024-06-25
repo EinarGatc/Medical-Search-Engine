@@ -12,15 +12,25 @@ valid_domains = [
     "ahrq.gov"
 ]
 
-def run_scraper(load_state=False) -> None:
-    
+def run_scraper(loadState=False, saveFile) -> None:
+    frontier = instantiate_frontier(loadState)
+
+    while not frontier.empty():
+        # Get Frontier
+        new_url = frontier.get()
+
+
+        # Check Content
+        # Extract Links
+        # Validate URL
+        # Add URLs to Frontier
 
     pass
 
-def instantiate_frontier(load_state) -> queue.Queue:
+def instantiate_frontier(loadState, saveFile) -> queue.Queue:
     frontier = queue.Queue()
-    
-    if load_state:
+
+    if loadState:
         pass
     else:
         for link in valid_domains:
