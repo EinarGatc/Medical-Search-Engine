@@ -12,8 +12,8 @@ validDomains = [
     "ahrq.gov"
 ]
 
-def run_scraper(loadState=False, saveFile="crawlerState.txt") -> None:
-    frontier = instantiate_frontier(loadState)
+def RunScraper(loadState=False, saveFile="crawlerState.txt") -> None:
+    frontier = InstantiateFrontier(loadState)
 
     while not frontier.empty():
         # Get Frontier
@@ -29,13 +29,13 @@ def run_scraper(loadState=False, saveFile="crawlerState.txt") -> None:
 
     pass
 
-def instantiate_frontier(loadState, saveFile) -> queue.Queue:
+def InstantiateFrontier(loadState, saveFile) -> queue.Queue:
     frontier = queue.Queue()
 
     if loadState:
         pass
     else:
-        for link in valid_domains:
+        for link in validDomains:
             frontier.put(link)
 
     return frontier
