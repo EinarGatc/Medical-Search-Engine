@@ -21,7 +21,9 @@ def RunScraper(loadState=False, saveFile="crawlerState.txt") -> None:
 
         # Check Content
 
-        # Extract Links
+        # Extract Links -> returns relative and absolute links
+
+        # Relative to Absolute URLs -> returns all absolute links
 
         # Validate URL
 
