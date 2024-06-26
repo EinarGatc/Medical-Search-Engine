@@ -1,30 +1,51 @@
+import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse, urlunparse
 
-def extractLinks(htmlString):
-    soup = BeautifulSoup(htmlString, 'html.parser')
-    links = soup.find_all('a')
+def extract_links(html_string, base_url):
+    absolute_urls = []
+    relative_urls = []
+    soup = BeautifulSoup(html_string, "html.parser")
     
-    extractedLinks = []
-    for link in links:
-        href = link.get('href')
-        if href and (href.startswith('http://') or href.startswith('https://')):
-            extractedLinks.append(href)
+    base_domain = urlparse(base_url).netloc
     
-    return extractedLinks
+    for tag in soup.find_all('a', href=True):
+        href = tag['href']
+        if href:
+            absolute_url = urljoin(base_url, href)
+            parsed_url = urlparse(absolute_url)
+            
+            # check if the URL belongs to the same domain
+            if parsed_url.netloc == base_domain:
+                path = parsed_url.path
+                normalized_path = url_normalize(path)
+                absolute_urls.append(absolute_url)
+                relative_urls.append(normalized_path)
+    
+    return absolute_urls, relative_urls
 
+def url_normalize(path):
+    path_parts = path.split('/')
+    normalized_parts = [part for part in path_parts if part]
+    normalized_path = '/' + '/'.join(normalized_parts) + '/'
+    return normalized_path
 
+# input: base_url, list of relative_urls
+def create_absolute_url(base_url, relative_links):
+    relative_to_absolute = []
 
+    for link in relative_links:
+        absolute_url = urljoin(base_url, link)
+        parsed_url = urlparse(absolute_url)
+        normalized_path = url_normalize(parsed_url.path)
+        newlink = urlunparse((parsed_url.scheme, parsed_url.netloc, normalized_path, '', '', ''))
+        relative_to_absolute.append(newlink)
 
-
-
-
-
+    return relative_to_absolute
 
 if __name__ == "__main__":
-    # Testing extract links
-    text = """
-    <!DOCTYPE html>
-<html lang="en" id="home" class="nojs us" data-root="https://medlineplus.gov/">
+    # Testing
+    html_string = """<html lang="en" id="home" class="nojs us" data-root="https://medlineplus.gov/">
 
     <head>
 
@@ -713,10 +734,32 @@ if __name__ == "__main__":
 </script>
 
     </body>
-</html>
-    
-    """
+</html>"""
 
-    links1 = extractLinks(text)
-    for link in links1:
+
+
+
+    base_url = "https://medlineplus.gov"
+    absolute_links, relative_links = extract_links(html_string, base_url) # extract all absolute links and relative links
+
+    print("----------------------- Absolute Links ---------------------------------")
+    for link in absolute_links:
         print(link)
+
+    print("----------------------- Relative Links ---------------------------------")
+    for link in relative_links:
+        print(link)
+    
+    relative_to_absolute_links = create_absolute_url(base_url, relative_links) # convert relative links into absolute links
+
+    print("--------------- Converted Relative to Absolute Links -------------------")
+    for link in relative_to_absolute_links:
+        print(link)
+
+    all_links = absolute_links + relative_to_absolute_links 
+    # join the newly converted links into the list of absolute links
+
+    print("--------------------- All Absolute Links -------------------------------")
+    for link in all_links:
+        print(link)
+
