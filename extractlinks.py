@@ -762,4 +762,3 @@ if __name__ == "__main__":
     print("--------------------- All Absolute Links -------------------------------")
     for link in all_links:
         print(link)
-
