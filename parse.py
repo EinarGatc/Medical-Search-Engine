@@ -40,13 +40,11 @@ stopwordsList = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "y
 
 #     return tokens
 
-def tokenize(filePath):
+def tokenize(content):
     pattern = re.compile(r"\b\w+(?:'\w+)?\b")
+    
     tokens = []
-
-    with open(filePath, 'r', encoding='utf-8') as file:
-        content = file.read().lower()
-        tokens = pattern.findall(content)
+    tokens = pattern.findall(content)
 
     filteredTokens = []
     for token in tokens:
