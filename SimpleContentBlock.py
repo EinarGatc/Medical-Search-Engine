@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import re
+from parse import tokenize
 
 def FindSimpleContentBlock(htmlContent : bytes, threshold : float = .5, lineBreak : int = 15) -> list | str:
     """Find content blocks of given the html content.
@@ -77,6 +78,6 @@ def FindSimpleContentBlock(htmlContent : bytes, threshold : float = .5, lineBrea
 
 
 if __name__ == "__main__":
-    resp = requests.get("https://en.wikipedia.org/wiki/Natural_language_processing")
-    result, output = FindSimpleContentBlock(resp.content, .8, 120)
+    resp = requests.get("https://www.mayoclinic.org/diseases-conditions/abdominal-aortic-aneurysm/symptoms-causes/syc-20350688")
+    result, output = FindSimpleContentBlock(resp.content, .3, 120)
     print(output)

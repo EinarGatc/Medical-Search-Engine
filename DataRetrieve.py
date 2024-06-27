@@ -5,7 +5,7 @@ import json
 import re
 from bs4 import BeautifulSoup
 
-def RetrieveUrlData(url) -> dict | int:
+def RetrieveUrlData(url : str) -> dict | int:
     """Fetch the raw HTML content from a given URL.
     
     Parameters
@@ -15,8 +15,8 @@ def RetrieveUrlData(url) -> dict | int:
     
     Returns
     -------
-    JSON
-        a JSON object that contains the url, content, encoding
+    dict
+        a dictionary object that contains the url, content, encoding
     int
         the status of the data retrieval
     """
@@ -31,7 +31,7 @@ def RetrieveUrlData(url) -> dict | int:
     return {"url" : page.url, "content": page.content.decode(page.encoding), "encoding" : page.encoding}, page.status_code
 
 
-def TrapDetection(url) -> bool | str:
+def TrapDetection(url : str) -> bool | str:
     """Detect and avoid crawler traps that could cause infinite loops.
     
     Parameters
@@ -47,25 +47,27 @@ def TrapDetection(url) -> bool | str:
         a string that outputs the reason the url is marked as not valid
     """
     statusError = ""
-    pattern = "\?.*"
-    newUrl = re.split(pattern, url)[0]
+    queryPattern = "\?.*"
+    domainPattern = "(?:https?:\/\/)(?:www\.)?(?:\w+\.?)+"
+    newUrl = re.split(queryPattern, url)[0]
     try:
-        domain = re.split("www.",url)[1].split("/")[0]
+        domain = re.search(domainPattern,url)[0].split("//")[1].replace("www.","")
     except:
-        domain = url.split("/")[0]
+        return True, "Could not find domain"
+        
     if newUrl in visitedUrls:
         return True, newUrl+" was already visited"
     elif domain not in validDomains:
         return True, domain+" is not in list of valid domains"
     return False, ""
 
-def SaveDocument(doc) -> None:
+def SaveDocument(doc : dict) -> None:
     """Store the processed document in a database or file system.
     
     Parameters
     ----------
-    doc : JSON
-        a JSON object that contains the url, content, and html type
+    doc : dict
+        a dictionary object that contains the url, content, and html type
     
     Returns
     -------
@@ -89,15 +91,17 @@ def SaveDocument(doc) -> None:
     with open(fileName, "w") as file:
         json.dump(newJSON, file, indent=4, separators=(',',': '))
 
+
+#This function is only used for testing purposes
 def run():
-    url = "https://ahrq.gov"
+    url = "https://medlineplus.gov/druginformation.html"
     doc, status = RetrieveUrlData(url)
     trap, error = TrapDetection(url)
     if trap:
         print(error)
         return
     if status == 200:
-        print(doc["url"])
+        print(f'Successfully saved {doc["url"]}')
         visitedUrls.add(doc["url"])
         SaveDocument(doc)
     else:
