@@ -1,8 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse, urlunparse
+from scraper import visitedUrls
 
-# TO DO: create visitedSet and isValid function for extractLinks checks
+# TO DO: create isValid function for extractLinks checks
 
 def extractLinks(baseUrl, htmlString):
     newLinks = []
@@ -12,12 +13,11 @@ def extractLinks(baseUrl, htmlString):
         if tag.get('href'):
             newLink = tag['href']
             absoluteLink = createAbsoluteUrl(baseUrl, newLink)
-            # if absoluteLink not in visitedSet and absoluteLink not in newLinks and isValid(absoluteLink): 
-            if absoluteLink not in newLinks: 
+            if absoluteLink not in visitedUrls and absoluteLink not in newLinks and isValid(absoluteLink): 
                 newLinks.append(newLink)
                 # add similarity checks here later
-            # else:
-            #     visitedSet.add(absoluteLink)
+            else:
+                visitedUrls.add(absoluteLink)
         
     return newLinks
     
