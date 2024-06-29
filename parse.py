@@ -39,9 +39,20 @@ def printFrequencies(frequencyMap):
   for token, frequency in frequencyMap.items():
       print(f"{token}: {frequency}")
 
+def TokenizeUnitTesting():
+    assert tokenize("! @ &*") == []
+    assert tokenize("$7$") == []
+    assert tokenize("don't") == ["don't"]
+    assert tokenize("") == []
+    assert tokenize("class classes'") == ["class", "classes"]
+    assert tokenize("~``` husband") == ["husband"]
+    assert tokenize("") == []
+    assert tokenize("editor-in-chief") == ["editor", "chief"]
+    print("Passed Tokenize Unit Testing")
 
 if __name__ == "__main__":
   # Testing tokenizer for html format of medlineplus.gov
+  TokenizeUnitTesting()
   bruh = """
   <!DOCTYPE html>
 <html lang="en" id="home" class="nojs us" data-root="https://medlineplus.gov/">
@@ -736,8 +747,3 @@ aria-label="Official website of the United States government"
 </html>
   
   """
-
-  tokens1 = tokenize(bruh)
-  print(len(tokens1))
-  tokens1map = computeTokenFreq(tokens1)
-  printFrequencies(tokens1map)
