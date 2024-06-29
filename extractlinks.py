@@ -1,32 +1,62 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse, urlunparse
-from Scraper import visitedUrls
+from scraper import visitedUrls
 
-# TO DO: create isValid function for extractLinks checks
+# TO DO: create isValid function for ExtractLinks checks
 
-def extractLinks(baseUrl, htmlString):
+def ExtractLinks(baseUrl, htmlString):
+    """Extracts links from a string of HTML content
+    
+    Parameters
+    ----------
+    baseUrl
+        the URL of the webpage the HTML content is from
+
+    htmlString
+        a string of HTML content
+    
+    Returns
+    -------
+    list
+        a list of extracted links
+    """
     newLinks = []
 
     soup = BeautifulSoup(htmlString, 'html.parser')
     for tag in soup.find_all('a'): 
       if tag.get('href'):
         newLink = tag['href']
-        absoluteLink = createAbsoluteUrl(baseUrl, newLink)
+        absoluteLink = CreateAbsoluteUrl(baseUrl, newLink)
         if absoluteLink not in visitedUrls and absoluteLink not in newLinks: 
           newLinks.append(absoluteLink)
         
     return newLinks
     
             
-def createAbsoluteUrl(baseUrl, newUrl):
+def CreateAbsoluteUrl(baseUrl, newUrl):
+    """Joins url to base URL to create absolute url
+    
+    Parameters
+    ----------
+    baseUrl
+        the URL of the webpage the HTML content is from
+        
+    newURL
+        url to transform into absolute url
+    
+    Returns
+    -------
+    list
+        absolute url
+    """
     newUrl = newUrl.split('#', 1)[0].strip().lower()
     absoluteUrl = urljoin(baseUrl, newUrl)
-    absoluteUrl = normalize(absoluteUrl)
+    absoluteUrl = Normalize(absoluteUrl)
 
     return absoluteUrl
 
-def normalize(url):
+def Normalize(url):
     """Normalize the URL by removing fragments and query parameters, lowercasing, etc."""
     parsed_url = urlparse(url)
     normalized_url = urlunparse((
@@ -40,21 +70,21 @@ def normalize(url):
     return normalized_url
 
 def ExtractLinksUnitTesting():
-  assert extractLinks("", "") == []
-  assert extractLinks("", "<li><a href=\"https://www.example.com/blog\">Blog</a></li>") == ["https://www.example.com/blog"]
-  assert extractLinks("", "<a href=\"https://www.example.com/blog\">") == ["https://www.example.com/blog"]
-  assert extractLinks("https://www.example.com", "<li><a href=\"blog\">Blog</a></li>") == ["https://www.example.com/blog"]
+  assert ExtractLinks("", "") == []
+  assert ExtractLinks("", "<li><a href=\"https://www.example.com/blog\">Blog</a></li>") == ["https://www.example.com/blog"]
+  assert ExtractLinks("", "<a href=\"https://www.example.com/blog\">") == ["https://www.example.com/blog"]
+  assert ExtractLinks("https://www.example.com", "<li><a href=\"blog\">Blog</a></li>") == ["https://www.example.com/blog"]
   print("Passed all ExtractLinks Unit Tests")
 
 def CreateAbsoluteUrlUnitTesting():
-  assert createAbsoluteUrl("","") == ""
-  assert createAbsoluteUrl("https://www.example.com", "blog") == "https://www.example.com/blog"
-  assert createAbsoluteUrl("https://www.example.com", "https://www.webmd.com/blog") == "https://www.webmd.com/blog"
+  assert CreateAbsoluteUrl("","") == ""
+  assert CreateAbsoluteUrl("https://www.example.com", "blog") == "https://www.example.com/blog"
+  assert CreateAbsoluteUrl("https://www.example.com", "https://www.webmd.com/blog") == "https://www.webmd.com/blog"
   print("Passed all CreateAbsoluteUrl Unit Tests")
 
 def NormalizeUnitTesting():
-  assert normalize("") == ""
-  assert normalize("https://www.webmd.com/blog?") == "https://www.webmd.com/blog?" # should return the url with the query preserved
+  assert Normalize("") == ""
+  assert Normalize("https://www.webmd.com/blog?") == "https://www.webmd.com/blog?" # should return the url with the query preserved
   print("Passed all Normalize Unit Tests")
 
 '''
@@ -131,7 +161,7 @@ if __name__ == "__main__":
   '''
       
   base_url = "https://medlineplus.gov"
-  newLinksExtracted = extractLinks(base_url, html_string) # extract all absolute links and relative links
+  newLinksExtracted = ExtractLinks(base_url, html_string) # extract all absolute links and relative links
 
   for link in newLinksExtracted:
       print(link)
