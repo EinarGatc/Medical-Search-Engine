@@ -114,7 +114,7 @@ def DetermineLowSlopeSections(dsc:list[tuple[int,int]], windowSize:int, slopeDSC
     for i in range(totalChunks-consecutiveChunks):
         chunks = [((i+j)*windowSize//2, (i+j+1)*windowSize//2) if (i+j+1)*windowSize//2 <= totalTokens  else ((i+j)*windowSize//2, totalTokens) for j in range(consecutiveChunks)]
         slopes = [prevSlopes[j] if j != consecutiveChunks-1 and prevSlopes[j] else CalculateSlopeDSC(dsc[chunk[0]:chunk[1]])[0] for j, chunk in enumerate(chunks)]
-        
+        print(chunks)
         prevSlopes.clear()
         prevSlopes = [slopes[j+1] for j in range(consecutiveChunks-1)]
 
@@ -152,7 +152,7 @@ def CalculateSlopeDSC(dsc:list[int,int]) -> int | int:
     int
         y-intercept of the line of best fit
     """
-
+    #Account for cases where there are a small number of points
     x_values, y_values = zip(*dsc)
 
 
@@ -302,9 +302,30 @@ def GetContentOfIntervals(htmlContent:bytes, intervals:list[tuple[int,int]]) -> 
                 
     return result
 
+def ActivationFunctionTest1():
+    assert(ActivationFunction(10) == 8)
+
+def ActivationFunctionTest2():
+    assert(ActivationFunction(7000) == 50)
+
+def ActivationFunctionTest3():
+    assert(ActivationFunction(500) == 10)
+
+def JoinIntervalsTest1():
+    assert(JoinIntervals([[(1,10),0.1],[(10,11),0.1],[(11,52),0.1],[(53,60),0.1]]) == [(1,52),(53,60)])
+
+def JoinIntervalsTest2():
+    assert(JoinIntervals([[(0,1),0.1],[(2,3),0.1],[(4,5),0.1],[(6,7),0.1]]) == [(0,1),(2,3),(4,5),(6,7)])
+
 if __name__ == "__main__":
     # resp = requests.get("https://en.wikipedia.org/wiki/Natural_language_processing")
-    resp = requests.get("https://www.mayoclinic.org/diseases-conditions/abdominal-aortic-aneurysm/symptoms-causes/syc-20350688")
+    #resp = requests.get("https://www.mayoclinic.org/diseases-conditions/abdominal-aortic-aneurysm/symptoms-causes/syc-20350688")
 
-    tokens = FindContentBlock(resp.content)
+    #tokens = FindContentBlock(resp.content)
+    ActivationFunctionTest1()
+    ActivationFunctionTest2()
+    ActivationFunctionTest3()
+    JoinIntervalsTest1()
+    JoinIntervalsTest2()
+    
     

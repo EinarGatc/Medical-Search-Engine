@@ -87,6 +87,35 @@ def TokenizeUnitTesting():
     assert Tokenize("editor-in-chief") == ["editor", "chief"]
     print("Passed Tokenize Unit Testing")
 
+def printFrequencies(frequencyMap):
+  for token, frequency in frequencyMap.items():
+      print(f"{token}: {frequency}")
+
+def TokenFrequencyTest1():
+  tokens = ["this","is","a","sample","token"]
+  assert(ComputeTokenFreq(tokens) == {"this":1,"is":1,"a":1,"sample":1,"token":1})
+
+def TokenFrequencyTest2():
+  tokens = []
+  assert(ComputeTokenFreq(tokens) == {})
+
+def TokenFrequencyTest3():
+  tokens = ["a","bear","in","a","barn"]
+  assert(ComputeTokenFreq(tokens) == {"a":2,"bear":1,"in":1,"barn":1})
+
+def TokenFrequencyTest4():
+  tokens = ["1","2","3","4","5","10","01"]
+  assert(ComputeTokenFreq(tokens) == {"1":1,"2":1,"3":1,"4":1,"5":1,"10":1,"01":1})
+
+def TokenFrequencyTest5():
+  tokens = ["A","a","wsx","wsx"]
+  assert(ComputeTokenFreq(tokens) == {"A":1,"a":1,"wsx":2})
+
 if __name__ == "__main__":
   # Testing Tokenizer for html format of medlineplus.gov
   TokenizeUnitTesting()
+  TokenFrequencyTest1()
+  TokenFrequencyTest2()
+  TokenFrequencyTest3()
+  TokenFrequencyTest4()
+  TokenFrequencyTest5()
