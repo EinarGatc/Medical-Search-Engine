@@ -64,9 +64,13 @@ def Normalize(url):
         parsed_url.netloc.lower(),
         parsed_url.path.rstrip('/'),
         parsed_url.params,
-        '',  
-        ''  
+        parsed_url.query,  # keep the query part
+        ''  # remove the fragment
     ))
+
+    if url.endswith('?') and not parsed_url.query:
+        normalized_url += '?'
+    
     return normalized_url
 
 def ExtractLinksUnitTesting():
