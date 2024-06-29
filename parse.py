@@ -61,7 +61,7 @@ def ComputeTokenFreq(tokensList):
     
 
 def PrintFrequencies(frequencyMap):
-    """Iterates through a dictionary of tokens mapped to their frequency and prints each token and its frequency
+  """Iterates through a dictionary of tokens mapped to their frequency and prints each token and its frequency
     
     Parameters
     ----------
