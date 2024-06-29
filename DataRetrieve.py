@@ -4,6 +4,7 @@ import requests
 import json
 import re
 from bs4 import BeautifulSoup
+import os
 
 def RetrieveUrlData(url : str) -> dict | int:
     """Fetch the raw HTML content from a given URL.
@@ -105,9 +106,55 @@ def run():
         visitedUrls.add(doc["url"])
         SaveDocument(doc)
     else:
-        print("Error Retrieving URL Data")
+        print("Error Retrieving URL Data")\
+    
+
+# Hearty's Tests
+def TestRetrieveURLData(url):
+    dictionary, status = RetrieveUrlData(url)
+
+    for value in dictionary.values():
+        assert value != ()
+
+    for value in dictionary.values(): # should print url, html content, and encoding
+        print(value)
+        print("-------------------------------------------------------------------------------------------------------------------")
+
+    print("Test cases passed")
+
+def TestSaveDocument(url):
+    file_path = 'Documents.json'
+
+    dictionary, status = RetrieveUrlData(url)
+    SaveDocument(dictionary)
+
+    assert os.path.isfile(file_path), "The JSON file was not created."
+    
+    # Load and check the JSON contents
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+
+    assert data is not None, "The JSON file is empty or invalid."
+    assert isinstance(data, list), "The JSON file does not contain a list."
+    assert len(data) > 0, "The JSON list is empty."
+
+    print("All Test Cases Passed")
+
 
 if __name__ == "__main__":
-    loadCrawler()
-    run()
-    saveCrawler()
+    # loadCrawler()
+    # run()
+    # saveCrawler()
+
+
+    # For running TestRetrieveURLData, test ONE URL at a time. Comment out so only one TestRetrieveURLData is active.
+
+    # TestRetrieveURLData("https://www.cdc.gov/index.html")
+    # TestRetrieveURLData("https://www.ncbi.nlm.nih.gov/")
+
+
+    TestSaveDocument("https://www.cdc.gov/index.html") 
+    TestSaveDocument("https://www.ncbi.nlm.nih.gov/")
+
+    # Manually check is Documents.json was generated and a dict containing(url, content, encoding) for both urls exist in the Documents.json
+
