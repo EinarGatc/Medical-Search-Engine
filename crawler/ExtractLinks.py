@@ -1,11 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse, urlunparse
-from scraper import visitedUrls
 
 # TO DO: create isValid function for ExtractLinks checks
 
-def ExtractLinks(baseUrl, htmlString):
+def ExtractLinks(baseUrl, htmlString, visitedUrls):
     """Extracts links from a string of HTML content
     
     Parameters
@@ -15,6 +14,9 @@ def ExtractLinks(baseUrl, htmlString):
 
     htmlString
         a string of HTML content
+    
+    visitedUrls
+        a set of visited urls
     
     Returns
     -------

@@ -54,10 +54,7 @@ def ComputeTokenFreq(tokensList):
       else:
           freqMap[token] = 1
 
-  alphabeticalSort = sorted(freqMap.items(), key=lambda x: x[0]) # sort by key
-  sortedFreqMap = dict(sorted(alphabeticalSort, key=lambda x: x[1], reverse=True)) # sort by value
-
-  return sortedFreqMap
+  return freqMap
     
 
 def PrintFrequencies(frequencyMap):

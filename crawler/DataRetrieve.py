@@ -1,10 +1,9 @@
-from scraper import visitedUrls, validDomains
-from SaveLoadCrawler import saveCrawler, loadCrawler
 import requests
 import json
 import re
 from bs4 import BeautifulSoup
 import os
+from urllib.parse import urlparse
 
 def RetrieveUrlData(url : str) -> dict | int:
     """Fetch the raw HTML content from a given URL.
@@ -27,40 +26,62 @@ def RetrieveUrlData(url : str) -> dict | int:
         return {}, 404
     
     if not page.ok:
-        return {}, page.status_code
+        return {}, 404
     
-    return {"url" : page.url, "content": page.content.decode(page.encoding), "encoding" : page.encoding}, page.status_code
+    return {"url" : page.url, "content": page.content, "encoding" : page.encoding}, page.status_code
 
 
-def TrapDetection(url : str) -> bool | str:
-    """Detect and avoid crawler traps that could cause infinite loops.
-    
+def IsValid(url, validDomains) -> bool:
+    """Check if the URL is valid against the acceptable set of URL's.
+
     Parameters
     ----------
-    url : string
-        a string that is a url which will be used to determine if the link is a trap
-    
+    url : str
+        a URL that is checked for validity
+    validDomains : list[str]
+        a list of domains as regex
+
     Returns
     -------
-    boolean
-        a boolean value that tells whether or not the url is a trap
-    string
-        a string that outputs the reason the url is marked as not valid
+    bool
+        a bool that indicates if the URL is valid
     """
-    statusError = ""
-    queryPattern = "\?.*"
-    domainPattern = "(?:https?:\/\/)(?:www\.)?(?:\w+\.?)+"
-    newUrl = re.split(queryPattern, url)[0]
+    # Decide whether to crawl this url or not. 
+    # If you decide to crawl it, return True; otherwise return False.
+    # There are already some conditions that return False.
     try:
-        domain = re.search(domainPattern,url)[0].split("//")[1].replace("www.","")
-    except:
-        return True, "Could not find domain"
+        parsed = urlparse(url)
         
-    if newUrl in visitedUrls:
-        return True, newUrl+" was already visited"
-    elif domain not in validDomains:
-        return True, domain+" is not in list of valid domains"
-    return False, ""
+        if parsed.scheme not in set(["http", "https"]):
+            return False
+        
+        # for domain in validDomains:
+        if not any(re.match(domain, parsed.netloc) for domain in validDomains):
+            return False
+        
+        if not url.isascii():
+            return False
+
+        repeatingDirs = r"^.*?(/.+?/).*?\1.*$|^.*?/(.+?/)\2.*$"
+        # if re.match(traps, url):
+        #     return False
+        if re.match(repeatingDirs, url):
+            return False
+        
+        return not re.match(
+            r".*\.(css|js|bmp|gif|jpe?g|ico"
+            + r"|png|tiff?|mid|mp2|mp3|mp4"
+            + r"|wav|avi|mov|mpeg|mpg|ram|m4v|mkv|ogg|ogv|pdf"
+            + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
+            + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
+            + r"|epub|dll|cnf|tgz|sha1|war|img|apk|ff"
+            + r"|thmx|mso|arff|rtf|jar|csv|bib|java|m|cc|odp|class|mexglx"
+            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|pov|sh)$", parsed.path.lower())
+
+    except TypeError:
+        print ("TypeError for ", parsed)
+        return False
+
 
 def SaveDocument(doc : dict) -> None:
     """Store the processed document in a database or file system.
@@ -94,19 +115,19 @@ def SaveDocument(doc : dict) -> None:
 
 
 #This function is only used for testing purposes
-def run():
-    url = "https://medlineplus.gov/druginformation.html"
-    doc, status = RetrieveUrlData(url)
-    trap, error = TrapDetection(url)
-    if trap:
-        print(error)
-        return
-    if status == 200:
-        print(f'Successfully saved {doc["url"]}')
-        visitedUrls.add(doc["url"])
-        SaveDocument(doc)
-    else:
-        print("Error Retrieving URL Data")\
+# def run():
+#     url = "https://medlineplus.gov/druginformation.html"
+#     doc, status = RetrieveUrlData(url)
+#     trap, error = TrapDetection(url)
+#     if trap:
+#         print(error)
+#         return
+#     if status == 200:
+#         print(f'Successfully saved {doc["url"]}')
+#         visitedUrls.add(doc["url"])
+#         SaveDocument(doc)
+#     else:
+#         print("Error Retrieving URL Data")\
     
 
 # Hearty's Tests

@@ -1,14 +1,17 @@
 from hashlib import md5
-from parse import tokenize, computeTokenFreq
+
 # from zlib import crc32
 
-def sim_hash(frequencies):
+def SimHash(frequencies, numBits:int=64) -> tuple():
     """Compute a similarity hash for the passed in dict.
     
     Parameters
     ----------
     frequencies : dict
         a dict containing URL tokens (key) and the corresponding count (value)
+    
+    numBits : int
+        number of bits to represent the hash (32,64)
     
     Returns
     -------
@@ -21,8 +24,8 @@ def sim_hash(frequencies):
         hash_v = md5(key.encode()).digest()[:8] # byte representation
         hashes[key] = hash_v # store hash values into hashes
 
-    binary_vector = []
-    for bit_index in range(64):
+    binary_vector = ""
+    for bit_index in range(numBits):
         value = 0
         byte_index = bit_index // 8 # create a byte_index using bit_index in the range
         for key, hash_v in hashes.items():
@@ -34,34 +37,35 @@ def sim_hash(frequencies):
             else:
                 value -= frequencies[key] # if bit is 0 we subtract the frequency to the value
         if value >= 0:
-            binary_vector.append(1) # append 1 if value is non-negative
+            binary_vector += "1" # append 1 if value is non-negative
         else:
-            binary_vector.append(0) # append 0 if value is negative
-    
-    # NOTE: Implementation for crc32 below
-    # for bit_index in range(32):
-    #     value = 0
-    #     byte_index = bit_index
-    #     for key, hash in hashes.items():
-    #         if (hash >> bit_index) & 1:
-    #             value += frequencies[key]
-    #         else:
-    #             value -= frequencies[key]
-    #     if value >= 0:
-    #         binary_vector.append(1)
-    #     else:
-    #         binary_vector.append(0)
-    return tuple(binary_vector)
+            binary_vector += "0" # append 0 if value is negative
+    '''
+    NOTE: Implementation for crc32 below
+    for bit_index in range(32):
+        value = 0
+        byte_index = bit_index
+        for key, hash in hashes.items():
+            if (hash >> bit_index) & 1:
+                value += frequencies[key]
+            else:
+                value -= frequencies[key]
+        if value >= 0:
+            binary_vector.append(1)
+        else:
+            binary_vector.append(0)
+    '''
+    return binary_vector
 
-def compute_sim_hash_similarity(vector1, vector2):
+def ComputeSimHashSimilarity(vector1, vector2):
     """Compute the sim hash similarity between two tuples.
     
     Parameters
     ----------
-    vector1 : tuple
-        a tuple containing binary vector representation of it's similarity score
-    vector2 : tuple
-        a tuple containing binary vector representation of it's similarity score
+    vector1 : string
+        a string containing binary vector representation of it's similarity score
+    vector2 : string
+        a string containing binary vector representation of it's similarity score
         
     Returns
     -------
@@ -69,11 +73,10 @@ def compute_sim_hash_similarity(vector1, vector2):
         an int indicating the number of bits similar between the two tuple hash vectors (vector1 & vector2)
     """
     count = 0
-    for i in range(64):
+    for i in range(len(vector1)):
         if vector1[i] == vector2[i]:
             count += 1
     return count
-
 
 # Hearty's Tests
 
@@ -98,10 +101,10 @@ def TestComputeSimHash():
 
     """
 
-    text1_tokens = tokenize(string1)
-    text2_tokens = tokenize(string2)
+    text1_tokens = Tokenize(string1)
+    text2_tokens = Tokenize(string2)
 
-    text1_freqMap = computeTokenFreq(text1_tokens)
+    text1_freqMap = ComputeTokenFreq(text1_tokens)
     text2_freqMap = computeTokenFreq(text2_tokens)
 
     assert sim_hash(text1_freqMap) != (), "The function returned an empty tuple"

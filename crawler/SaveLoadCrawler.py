@@ -1,5 +1,5 @@
 import pickle
-from scraper import visitedUrls, contentHashes, validDomains
+from Scraper import visitedUrls, contentHashes, validDomains
 
 def saveCrawler():
     state = {
