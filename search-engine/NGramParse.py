@@ -53,6 +53,7 @@ def parse_document(text):
     textBigrams = list(nltk.bigrams(tokens))
     
     # add bigrams to current list of tokens
+    # bigrams are a tuple
     tokens.extend(textBigrams)
 
     return tokens
@@ -87,13 +88,21 @@ def compute_token_frequencies(tokens):
     frequencies = dict()
     token_pos = 0
     for token in tokens:
-        if token in frequencies:
-            frequencies[token][0] += 1
-        else: # token does not exist
-            frequencies[token] = [1, list()] # set token count equal to 1
-        frequencies[token][1].append(token_pos)
+
+        if isinstance(token, tuple): # if bigram
+            if token not in frequencies:
+                frequencies[token] = [0, []]
+            frequencies[token] = frequencies[token[0]]
+
+        else:
+            if token in frequencies:
+                frequencies[token][0] += 1
+            else: # token does not exist
+                frequencies[token] = [1, list()] # set token count equal to 1
+            frequencies[token][1].append(token_pos)
+
         token_pos += 1
-    
+
     return frequencies
 
 def compute_token_frequencies2(tokens):
@@ -133,12 +142,6 @@ def compute_token_frequencies2(tokens):
     
     return frequencies
 
-# def GenerateBigrams(text):
-#     tokens = parse_document(text)
-#     tokenBigrams = list(nltk.bigrams(tokens))
-
-#     return tokenBigrams
-
 if __name__ == "__main__":
     sample = '''In the heart of the ancient forest, where the canopy was so thick that sunlight barely touched the ground, lived a girl named Elara. 
     She had grown up among the towering trees and whispering leaves, her only companions the creatures of the wood and the distant echo of her mother's 
@@ -151,8 +154,6 @@ if __name__ == "__main__":
     tokens = parse_document(sample)
     freqMap = compute_token_frequencies(tokens)
 
-    # for c in tokens:
-    #     print(c)
     for key, val in freqMap.items():
         print(f"{key}: {val}")
  
