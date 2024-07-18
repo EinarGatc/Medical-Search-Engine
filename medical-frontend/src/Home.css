@@ -1,0 +1,112 @@
+#home-page .section{
+    padding: 3% var(--horizontal-padding);
+}
+
+#home-page .hero {
+    padding-top: 0px;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    img{
+        margin-left: auto;
+        width: 100%;
+        margin-right: 0px;
+    }
+}
+
+#home-page .head {
+    align-content: center;
+    p{
+        width: 75%;
+    }
+    button{
+        margin-top: 2%;
+        padding: .75em 2.5em;
+        outline: none;
+        border: 0px;
+        background-color: var(--c2);
+        color: white;
+        border-radius: 25em;
+        font-size: 20px;
+        transition: background-color .5s;
+    }
+    button:hover{
+        cursor: pointer;
+        background-color: var(--c1);
+    }
+}
+
+#home-page .how-it-works{
+    p{
+        margin-top: 3%;
+    }
+}
+
+#home-page .cards{
+    list-style: none;
+    margin-top: 3%;
+    padding-left: var(--shadow-padding);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15%;
+}
+
+#home-page .cards li{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--c3);
+    border-radius: 5px;
+    box-shadow: calc(-1*var(--shadow-padding)) var(--shadow-padding) 20px 0px var(--c5);
+    color: var(--c1);
+    font-weight: bold;
+    font-size: 25px;
+    padding: 2% 5%;
+    text-align: center;
+    img{
+        margin: 10% 0px;
+        width: 100px;
+    }
+}
+
+#home-page .how-to-use{
+    display: block;
+    background-color: var(--c2);
+    color: white;
+    h1{
+        color: white;
+    }
+    ol li{
+        padding-bottom: 1%;
+    }
+}
+
+@media (max-width: 1000px) {
+    #home-page .cards{
+        gap: 5%;
+    }
+}
+
+@media (max-width: 800px) {
+    #home-page .hero {
+        grid-template-columns: 1fr; 
+    }
+    #home-page .cards{
+        display: flex;
+        flex-direction: column;
+        li{
+            margin: 5% 0px;
+            h3{
+                margin: 0px;
+            }
+            img{
+                margin: 0px;
+            }
+        }
+    }
+}
+
+@media (max-width: 300px) {
+    #home-page .cards{
+        display: none;
+    }
+}
