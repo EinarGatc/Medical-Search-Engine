@@ -5,6 +5,7 @@
   --c4: #c6d3e3;
   --c5: #577397;
   --c6: #b9bbbe;
+  --c7: #9fb3cb;
   font-family: sans-serif;
   --horizontal-padding: 10%;
   --shadow-padding: 5px;
@@ -34,7 +35,7 @@ h2{
 }
 
 p{
-  font-family: "Nunito", sans-serif;
+  font-family: "Rubik", sans-serif;
 }
 
 #navbar{
@@ -57,6 +58,10 @@ p{
   justify-content: end;
   align-items: center;
   gap: 20px;
+}
+
+#navbar ul a{
+  font-size: 25px;
 }
 
 .home-button {
@@ -96,10 +101,14 @@ p{
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  h3{
+    margin:0px;
+  }
   p{
     text-align: center;
-    width: 40%;
+    width: 50%;
     margin-bottom: .5%;
+    line-height:1.8em;
   }
 }
 

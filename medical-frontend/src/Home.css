@@ -1,3 +1,10 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap'); */
+
+@import url('https://fonts.googleapis.com/css2?family=Kalnia+Glaze:wght@100..700&family=Noto+Sans+JP:wght@100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
+body{
+    font-family: "Rubik", sans-serif;
+}
 #home-page .section{
     padding: 3% var(--horizontal-padding);
 }
@@ -11,12 +18,20 @@
         width: 100%;
         margin-right: 0px;
     }
+    h1{
+        font-size:70px;
+    }
+    padding-top:50px;
+    padding-bottom:160px;
 }
 
 #home-page .head {
     align-content: center;
     p{
+        padding-left:2px;
         width: 75%;
+        font-size:20px; 
+        line-height:1.8em;
     }
     button{
         margin-top: 2%;
@@ -38,34 +53,49 @@
 #home-page .how-it-works{
     p{
         margin-top: 3%;
+        font-size:20px;
+        line-height:1.8em;
     }
+}
+
+#home-page .cards-container{
+    display:flex;
+    justify-content:center;
 }
 
 #home-page .cards{
     list-style: none;
     margin-top: 3%;
     padding-left: var(--shadow-padding);
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 15%;
+    display: flex;
+    /* grid-template-columns: 1fr 1fr 1fr;
+    gap: 15%; */
+
+   
 }
 
 #home-page .cards li{
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     background-color: var(--c3);
     border-radius: 5px;
-    box-shadow: calc(-1*var(--shadow-padding)) var(--shadow-padding) 20px 0px var(--c5);
+    box-shadow: calc(-1*var(--shadow-padding)) var(--shadow-padding) 8px 1px var(--c7);
     color: var(--c1);
     font-weight: bold;
     font-size: 25px;
-    padding: 2% 5%;
+    /* padding: 2% 5%; */
     text-align: center;
     img{
+        padding-top:20px;
         margin: 10% 0px;
         width: 100px;
     }
+
+    min-width:260px;
+    min-height:300px;
+    margin:25px;
 }
 
 #home-page .how-to-use{
@@ -74,9 +104,13 @@
     color: white;
     h1{
         color: white;
+        margin-bottom:35px;
     }
     ol li{
-        padding-bottom: 1%;
+        /* padding-bottom: 1%; */
+        font-family: "Rubik", sans-serif;
+        line-height:2em;
+        font-size:20px;
     }
 }
 
@@ -90,6 +124,12 @@
     #home-page .hero {
         grid-template-columns: 1fr; 
     }
+
+    #home-page .head{
+        margin-bottom:70px;
+    }
+
+
     #home-page .cards{
         display: flex;
         flex-direction: column;

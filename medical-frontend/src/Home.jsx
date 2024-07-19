@@ -34,20 +34,23 @@ function App() {
           NCBI, CDC, Mayo Clinic, Merck Manuals, NNLM, Testing.com, and AHRQ, ensuring you receive 
           accurate and up-to-date information for all your health-related queries
         </p>
-        <ul class="cards">
-          <li>
-            <h3>Webcrawler</h3>
-            <img src={computer}></img>
-          </li>
-          <li>
-            <h3>Search Engine</h3>
-            <img src={www}></img>
-          </li>
-          <li>
-            <h3>OpenAI API</h3>
-            <img src={logic}></img>
-          </li>
-        </ul>
+        <div className="cards-container">
+          <ul class="cards">
+            <li>
+              <h3>Webcrawler</h3>
+              <img src={computer}></img>
+            </li>
+            <li>
+              <h3>Search Engine</h3>
+              <img src={www}></img>
+            </li>
+            <li>
+              <h3>OpenAI API</h3>
+              <img src={logic}></img>
+            </li>
+          </ul>
+        </div>
+       
         <Disclaimer></Disclaimer>
       </section>
       <section class="how-to-use section">
