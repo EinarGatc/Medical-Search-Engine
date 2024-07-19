@@ -152,8 +152,13 @@ if __name__ == "__main__":
     danger she had never imagined.'''
 
     tokens = parse_document(sample)
-    freqMap = compute_token_frequencies(tokens)
+    freqMap1 = compute_token_frequencies(tokens)
 
-    for key, val in freqMap.items():
+    freqMap2 = compute_token_frequencies2(tokens)
+
+    for key, val in freqMap1.items():
+        print(f"{key}: {val}")
+
+    for key, val in freqMap2.items():
         print(f"{key}: {val}")
  
