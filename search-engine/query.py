@@ -2,12 +2,12 @@ import nltk
 import threading
 nltk.download('stopwords')
 from nltk.corpus import stopwords
-import SearchEngine.stemming as stemming
-from SearchEngine.index_data import get_query_postings, query_postings_to_id, get_files, get_urls
-from SearchEngine.intersect import intersect_query_terms
-from SearchEngine.posting import decode_posting_list
+import stemming as stemming
+from index_data import get_query_postings, query_postings_to_id, get_files, get_urls
+from intersect import intersect_query_terms
+from posting import decode_posting_list
 import time
-from SearchEngine.cache import Cache, load_cache, save_cache
+from cache import Cache, load_cache, save_cache
 
 # filepath1 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index.txt"
 # filepath2 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_urls.txt"

@@ -64,26 +64,16 @@ def compute_token_frequencies(tokens):
     Parameters
     ----------
     tokens : list
-        list of tokens [(tokens, tag) ... (tokens, tag)]
+        list of tokens
     
     Returns
     -------
     dict
-        a dictionary containing a token (key) and count (value) key-value pair
-    
-    Runtime
-    -------
-    n1 is the number of tokens present within the text file, n1 <= N, where N is the number of characters 
-        within the text file
-    Linear time in the number of tokens within the text file O(n1) = O(N)
-        (tokens computed from tokenize function)
-    Just iterating over the number of tokens within the text file and adding
-        to the token count wihtin the dictionary. 
-        If the key exists then add to the token count, which takes O(1) time
-        If the key doesnt exist then set the key to the token and set the count to 1 O(1) time
-    Therefore the time complexity of the algorithm is O(n1) == O(N) or in other words linear
-        to the number of tokens present within the text file, which is at most the number of
-        characters, N
+        a dictionary containing:
+        key: token
+
+        value: a list where the first item is the frequency and the second item is a list of positions
+            [frequency, [position]] where position is the position in the text where the token is found
     """
     frequencies = dict()
     token_pos = 0
@@ -106,31 +96,18 @@ def compute_token_frequencies(tokens):
     return frequencies
 
 def compute_token_frequencies2(tokens):
-    """Compute the frequency of tokens
+    """Computes the frequency of tokens
     
     Parameters
     ----------
     tokens : list
-        list of tokens [(tokens, tag) ... (tokens, tag)]
+        list of tokens 
     
     Returns
     -------
     dict
-        a dictionary containing a token (key) and count (value) key-value pair
+        a dictionary containing a token: count key-value pair
     
-    Runtime
-    -------
-    n1 is the number of tokens present within the text file, n1 <= N, where N is the number of characters 
-        within the text file
-    Linear time in the number of tokens within the text file O(n1) = O(N)
-        (tokens computed from tokenize function)
-    Just iterating over the number of tokens within the text file and adding
-        to the token count wihtin the dictionary. 
-        If the key exists then add to the token count, which takes O(1) time
-        If the key doesnt exist then set the key to the token and set the count to 1 O(1) time
-    Therefore the time complexity of the algorithm is O(n1) == O(N) or in other words linear
-        to the number of tokens present within the text file, which is at most the number of
-        characters, N
     """
     frequencies = dict()
     
