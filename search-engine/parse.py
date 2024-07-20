@@ -49,12 +49,18 @@ def parse_document(text):
     if token: # if last token is not empty string add to tokens
         tokens.append(token)
 
-    # generate bigrams
+    # generate a list of bigrams (in tuple form by default)
     textBigrams = list(nltk.bigrams(tokens))
+
+    bigramList = []
+
+    for tuple in textBigrams: # change tuples into string
+        bigramStr = " ".join(tuple)
+        bigramList.append(bigramStr)
+        
     
     # add bigrams to current list of tokens
-    # bigrams are a tuple
-    tokens.extend(textBigrams)
+    tokens.extend(bigramList)
 
     return tokens
 
@@ -77,23 +83,33 @@ def compute_token_frequencies(tokens):
     """
     frequencies = dict()
     token_pos = 0
+
     for token in tokens:
-
-        if isinstance(token, tuple): # if bigram
-            if token not in frequencies:
-                frequencies[token] = [0, []]
-            frequencies[token] = frequencies[token[0]]
-
-        else:
-            if token in frequencies:
-                frequencies[token][0] += 1
-            else: # token does not exist
-                frequencies[token] = [1, list()] # set token count equal to 1
-            frequencies[token][1].append(token_pos)
-
+        if token in frequencies:
+            frequencies[token][0] += 1
+        else: # token does not exist
+            frequencies[token] = [1, list()] # set token count equal to 1
+        frequencies[token][1].append(token_pos)
         token_pos += 1
-
+    
     return frequencies
+
+
+    #     if isinstance(token, tuple): # if bigram
+    #         if token not in frequencies:
+    #             frequencies[token] = [0, []]
+    #         frequencies[token] = frequencies[token[0]]
+
+    #     else:
+    #         if token in frequencies:
+    #             frequencies[token][0] += 1
+    #         else: # token does not exist
+    #             frequencies[token] = [1, list()] # set token count equal to 1
+    #         frequencies[token][1].append(token_pos)
+
+    #     token_pos += 1
+
+    # return frequencies
 
 def compute_token_frequencies2(tokens):
     """Computes the frequency of tokens
@@ -126,15 +142,17 @@ if __name__ == "__main__":
     its bark shimmering with an ethereal glow. Intrigued, she approached and found a small, intricately carved box nestled among its roots. As she opened it, 
     a soft, golden light enveloped her, and she heard a voice, gentle yet commanding, You have been chosen, Elara, to awaken the ancient guardians and restore 
     balance to our world. Thus began her journey, one that would take her far beyond the familiar confines of her forest home and into realms of magic and 
-    danger she had never imagined.'''
+    danger she had never imagined. danger she. never imagined.'''
 
     tokens = parse_document(sample)
-    freqMap1 = compute_token_frequencies(tokens)
+    print(tokens)
+
+    # freqMap1 = compute_token_frequencies(tokens)
 
     freqMap2 = compute_token_frequencies2(tokens)
 
-    for key, val in freqMap1.items():
-        print(f"{key}: {val}")
+    # for key, val in freqMap1.items():
+    #     print(f"{key}: {val}")
 
     for key, val in freqMap2.items():
         print(f"{key}: {val}")
