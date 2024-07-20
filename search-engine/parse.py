@@ -18,22 +18,6 @@ def parse_document(text):
     -------
     list
         a list of tokens read from the input file
-    
-    Runtime
-    -------
-    N is the number of characters in the file
-    Create a buffer that reads 1024 bytes from the file and do that for
-        the size of the text file O(N)
-    Iterate over the buffer and check if a character is alphanumeric O(1)  
-    If a character is alphanumeric then add it to the current token
-    If a character is non alphanumeric then add the token to the tokens list 
-        If the token is not an empty string. Then reset the current working
-        token
-    If buffer is smaller than the buffer_size (1024), flip the last_line flag
-    If the last_line flag is true and the current working token is not
-        an empty string, add the token to the tokens list
-    Therefore the time complexity of the algorithm is O(N) or in other words 
-        linear to the number of characters in the file
     """
     tokens = []
     token = ""
@@ -94,23 +78,6 @@ def compute_token_frequencies(tokens):
     
     return frequencies
 
-
-    #     if isinstance(token, tuple): # if bigram
-    #         if token not in frequencies:
-    #             frequencies[token] = [0, []]
-    #         frequencies[token] = frequencies[token[0]]
-
-    #     else:
-    #         if token in frequencies:
-    #             frequencies[token][0] += 1
-    #         else: # token does not exist
-    #             frequencies[token] = [1, list()] # set token count equal to 1
-    #         frequencies[token][1].append(token_pos)
-
-    #     token_pos += 1
-
-    # return frequencies
-
 def compute_token_frequencies2(tokens):
     """Computes the frequency of tokens
     
@@ -147,12 +114,11 @@ if __name__ == "__main__":
     tokens = parse_document(sample)
     print(tokens)
 
-    # freqMap1 = compute_token_frequencies(tokens)
-
+    freqMap1 = compute_token_frequencies(tokens)
     freqMap2 = compute_token_frequencies2(tokens)
 
-    # for key, val in freqMap1.items():
-    #     print(f"{key}: {val}")
+    for key, val in freqMap1.items():
+        print(f"{key}: {val}")
 
     for key, val in freqMap2.items():
         print(f"{key}: {val}")
