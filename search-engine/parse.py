@@ -36,15 +36,21 @@ def parse_document(text):
     # generate a list of bigrams (in tuple form by default)
     textBigrams = list(nltk.bigrams(tokens))
 
-    bigramList = []
+    textTrigrams = list(nltk.trigrams(tokens))
+
+    gramList = []
 
     for tuple in textBigrams: # change tuples into string
         bigramStr = " ".join(tuple)
-        bigramList.append(bigramStr)
+        gramList.append(bigramStr)
+
+    for tuple in textTrigrams:
+        trigramStr = " ".join(tuple)
+        gramList.append(trigramStr)
         
     
     # add bigrams to current list of tokens
-    tokens.extend(bigramList)
+    tokens.extend(gramList)
 
     return tokens
 
@@ -114,12 +120,12 @@ if __name__ == "__main__":
     tokens = parse_document(sample)
     print(tokens)
 
-    freqMap1 = compute_token_frequencies(tokens)
-    freqMap2 = compute_token_frequencies2(tokens)
+    # freqMap1 = compute_token_frequencies(tokens)
+    # freqMap2 = compute_token_frequencies2(tokens)
 
-    for key, val in freqMap1.items():
-        print(f"{key}: {val}")
+    # for key, val in freqMap1.items():
+    #     print(f"{key}: {val}")
 
-    for key, val in freqMap2.items():
-        print(f"{key}: {val}")
+    # for key, val in freqMap2.items():
+    #     print(f"{key}: {val}")
  

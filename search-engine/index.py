@@ -36,12 +36,6 @@ def build_index(documents, batch_size):
     id_to_document = dict()
     index = dict()
     index_urls = dict()
-                                                        
-    # get batch of documents
-        # check if batch is empty if true then exit
-        # run parser and stemmer
-    # If batch is finished save the chunk
-    # create final index
     
     # 1. get a batch of documents
     # 2. parse and stem batch, and add into index
@@ -63,8 +57,8 @@ def build_index(documents, batch_size):
             if not check_content(hash_vector, similarity_threshold=60): # content unique get links
                 continue
             
-            id_to_document[n] = d 
-            index_urls[n] = data["url"]
+            id_to_document[n] = d # create a mapping from a document ID (n) to the document(d)
+            index_urls[n] = data["url"] # create a mapping from a document ID (n) to its url
             content_hashes.add(hash_vector)
 
             stemmed_token_tags_dict = get_tokens_with_tags(text)
@@ -90,7 +84,7 @@ def build_index(documents, batch_size):
     
     merge_indexes(chunk-1, len(documents))
     
-    # return index
+    return index
 
 def build_index2(documents):
     '''Builds an inverted index from list of documents and returns a dict of updated information.'''
@@ -349,14 +343,18 @@ def convert_seek_into_dict():
 
 
 if __name__ == "__main__":
-    documents = get_documents("/Users/egatchal/Desktop/Assignments/CS121/DEV", True, 100) # For Pookiebear
+    # documents = get_documents("/Users/egatchal/Desktop/Assignments/CS121/DEV", True, 100) # For Pookiebear
     # documents = get_documents("/Users/shika/Desktop/DEV", False) # For Jeff
-    # documents = get_documents("/Users/hearty/Assignment3_CS_121/Assignment3/DEV", True) # harpy
-    starttime = time.time()
-    build_index(documents, 4)
-    endtime = time.time()
-    print(f"Time: {endtime-starttime}")
-    print("END")
+    documents = get_documents("Medical-Search-Engine\developer", True) # harpy
+
+    index = build_index(documents, 3)
+    save_index(index)
+
+    # starttime = time.time()
+    # build_index(documents, 4)
+    # endtime = time.time()
+    # print(f"Time: {endtime-starttime}")
+    # print("END")
 
     # result = binary_search(["software", "machine", "0"])
     # print("print result", result)
