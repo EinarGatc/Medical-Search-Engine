@@ -2,7 +2,7 @@ import os, json, sys
 from collections import defaultdict
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse, urlunparse
-from scipy.sparse import csr_matrix, linalg
+import scipy.sparse as sp
 import numpy as np
 linkCount = 0
 adjacencyList = defaultdict(list)
@@ -19,10 +19,12 @@ def CreateAdjacencyList(folderPath, adjListFolderPath, restrictDocs = True, maxD
         data = GetJsonData(docuementPath)
         text = BeautifulSoup(data["content"], "html.parser")
         url = data["url"]
-        
+
         if url not in visited:
             visited.add(url)
-            docs[url] = len(docs)
+
+            if url not in docs:
+                docs[url] = len(docs)
             
             adjacentLinks = GetUrls(url, text)
             
@@ -37,7 +39,9 @@ def CreateAdjacencyList(folderPath, adjListFolderPath, restrictDocs = True, maxD
             offloadCount += 1 
     
     OffloadAdjacencyList(offloadCount, adjListFolderPath)
-    CombineAdjacencyLists(adjListFolderPath)
+    adjacencyList.clear()
+    offloadCount += 1 
+    CombineAdjacencyLists(adjListFolderPath, offloadCount)
 
 def OffloadAdjacencyList(offloadCount, folderPath):
     if not os.path.exists(folderPath):
@@ -49,20 +53,20 @@ def OffloadAdjacencyList(offloadCount, folderPath):
         for k, v in adjacencyList.items():
             f.write(f"{k}:{v}\n")
 
-def CombineAdjacencyLists(folderPath):
+def CombineAdjacencyLists(folderPath, offloadCount):
     # filePath = os.path.join(folderPath, f"AdjListFinal.txt")
     filePath = "AdjListFinal.txt"
     finalFile = open(filePath, "w+")
 
-    for adjListPath in GetDocuments(folderPath):
-        with open(adjListPath, "r+") as f:
+    for i in range(offloadCount):
+        with open(f"{folderPath}/AdjList{i}.txt", "r+") as f:
             line = f.readline()
             while line:
                 finalFile.write(line)
                 line = f.readline()
     
     finalFile.close()
-            
+
 def GetDocuments(folderPath):
     '''Gathers and returns a list of filepaths from a folder passed in.'''
     documents = []
@@ -144,27 +148,16 @@ def Normalize(url):
     ))
     return normalizedUrl
 
-def pageRank(threshold, beta) :
-    A = ConvertAdjListToMatrix(len(docs), "/Users/egatchal/Medical-Search-Engine/AdjListFinal.txt", "/Users/egatchal/Medical-Search-Engine/AdjMatrixFinal.txt")
-    arr = np.array(A, dtype=float)
-    
-    s = []
-    n = len(A)
-    
-    for i in range(n):
-        s.append(np.sum(arr[:,i]))
-
-    M = arr 
-
-    for i in range(n):
-        M[:,i] = M[:,i] / s[i]
-
-    rNew = (1.0+np.zeros([len(M), 1])) / len(M)
+def PageRank(M, threshold, beta) :
+    n = M.shape[0]
+    rNew = (1.0+np.zeros([n, 1])) / n
     c = (1.0-beta) * rNew
     rPrev = rNew
 
     for i in range(0,1000):
-        rNew = beta * np.matmul(M, rPrev) + c
+        print(M.shape)
+        print(rPrev.shape)
+        rNew = beta * (M @ rPrev) + c
         diff = np.sum(abs(rNew-rPrev))
         if diff < threshold:
             break
@@ -172,49 +165,41 @@ def pageRank(threshold, beta) :
 
     return rNew[:,0]
 
-def ConvertAdjListToMatrix(numDocs, adjListFilePath, adjMatrixFilePath):
-    fileAdjMatrix = open(adjMatrixFilePath, "w+")
-    matrix = [[0 for j in range(numDocs)] for i in range(numDocs)]
+def ConvertAdjListToMatrix(adjListFilePath, adjMatrixFilePath):
+    values = []
+    rows = []
+    cols = []
 
+    with open(adjListFilePath, "r+") as file:
+        data = file.readline().split(":", 1)
+        while data[0]:
+            node, neighbors = int(data[0]), set([int(n) for n in data[1][1:-2].split(",")])
+            
+            prob = 1.0 / len(neighbors)
+            for i in neighbors:
+                values.append(prob)
+                rows.append(node)
+                cols.append(i)
+        
+            data = file.readline().split(":", 1)
+
+    n = max(max(rows), max(cols)) + 1
+    sparseMatrix = sp.coo_matrix((values, (cols, rows)), shape=(n,n))
+    return sparseMatrix
+
+def ConvertAdjListToTelMatrix(n, adjListFilePath, adjMatrixFilePath):
+
+    fileAdjMatrix = open(adjMatrixFilePath, "w+")
+    matrix = np.zeros((n,n))
+    print("Created matrix")
     with open(adjListFilePath, "r+") as file:
 
         data = file.readline().split(":", 1)
         node, neighbors = int(data[0]), set([int(n) for n in data[1][1:-2].split(",")])
 
-        for i in range(numDocs):
-            for j in range(numDocs):
-                if i == j or (i == node and j in neighbors):
-                    matrix[i][j] = 1
-                    fileAdjMatrix.write(f"1 ")
-                    
-                else:
-                    fileAdjMatrix.write("0 ")
-            fileAdjMatrix.write("\n")
-            if i == node:
-                data = file.readline().split(":", 1)
-                if data[0]:
-                    node, neighbors = int(data[0]), set([int(n) for n in data[1][1:-2].split(",")])
-    
-    denseMatrix = np.array(matrix, dtype=float)
-    # rows, cols = np.nonzero(denseMatrix)
-    # values = denseMatrix[rows, cols]
-    # sparseMatrix = csr_matrix((values, (rows, cols)), shape=denseMatrix.shape)
-    fileAdjMatrix.close()
-
-    return denseMatrix
-
-def ConvertAdjListToTelMatrix(numDocs, adjListFilePath, adjMatrixFilePath):
-    fileAdjMatrix = open(adjMatrixFilePath, "w+")
-    matrix = [[0 for j in range(numDocs)] for i in range(numDocs)]
-
-    with open(adjListFilePath, "r+") as file:
-
-        data = file.readline().split(":", 1)
-        node, neighbors = int(data[0]), set([int(n) for n in data[1][1:-2].split(",")])
-
-        for i in range(numDocs):
+        for i in range(n):
             prob = 1.0 / (len(neighbors)+1) if i == node else 1
-            for j in range(numDocs):
+            for j in range(n):
                 if i == j or (i == node and j in neighbors):
                     matrix[i][j] = prob
                     fileAdjMatrix.write(f"{prob} ")
@@ -241,7 +226,20 @@ def clearFolder(folderPath):
             documentPath = os.path.join(root, filename)
             os.remove(documentPath)
 
+def SavePageRank(pageRankScores, filePath):
+    with open(filePath, "w+") as f:
+        for v in pageRankScores:
+            f.write(f"{v}\n")
+
+def CreatePageRank(folderPathDocs, folderPathAdjList, filePathPRS):
+    CreateAdjacencyList(folderPathDocs, folderPathAdjList, filePathPRS)
+    print("Create Adajacency List")
+    M = ConvertAdjListToMatrix("/Users/egatchal/Medical-Search-Engine/AdjListFinal.txt", "/Users/egatchal/Medical-Search-Engine/AdjMatrixFinal.txt")
+    print("Convert Adjancency List to Matrix")
+    pageRankScores = PageRank(M, 0.00000000001, 0.8)
+    print("Finished Creating PageRank Scores")
+    SavePageRank(pageRankScores, filePathPRS)
+    print("Finished Saving PageRank Scores")
+
 if __name__ == "__main__":
-    CreateAdjacencyList("/Users/egatchal/Desktop/Projects/DEV", "/Users/egatchal/Medical-Search-Engine/AdjListFolder", maxDocs=10)
-    pageRankScores = pageRank(0.00000000001, 0.8)
-    print(pageRankScores)
+    CreatePageRank("/Users/egatchal/Medical-Search-Engine/crawler/CDC_Documents", "/Users/egatchal/Medical-Search-Engine/AdjListFolder","/Users/egatchal/Medical-Search-Engine/PRS.txt")

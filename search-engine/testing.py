@@ -1,14 +1,27 @@
-def write_to_txt(file, tokens):
-    last_token = None
-    file.seek(0)
-    file.truncate()
-    for token in tokens:
-        current_pointer = file.tell()
-        if last_token and token == last_token:
-            file.seek(current_pointer-1)
-        file.write(token+"\n")
-        last_token = token
+def min_distance_between_words_in_order(str, words):
+    words_list = str.split()
+    n = len(words)
+    positions = [-1] * n  # Array to store positions of words in order
+    minDistance = float('inf')
+    current_word_index = 0
+
+    for i in range(len(words_list)):
+        if words_list[i] == words[current_word_index]:
+            positions[current_word_index] = i
+            current_word_index += 1
+            
+            # If we found all words in order at least once
+            if current_word_index == n:
+                # Calculate distance between first and last words
+                current_distance = positions[-1] - positions[0]
+                if current_distance < minDistance:
+                    minDistance = current_distance
     
+    # If we didn't find all words in order
+    if current_word_index != n:
+        return -1
+    
+    return minDistance
+
 if __name__ == "__main__":
-    with open("test.txt", "r+") as f:
-        write_to_txt(f,["allow", "crash", "crash", "create", "determine"])
+   print(min_distance_between_words_in_order("find nearest find nearest find store store a nearest store", ["find", "nearest", "store"]))
