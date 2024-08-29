@@ -76,13 +76,15 @@ def compute_sim_hash_similarity(vector1, vector2):
     return count
 
 if __name__ == "__main__":
-    # d1 = {"high":1, "low":1, "begging":1}
-    # d2 = {"high":6, "low":20, "begging":1}
-    # hash1 = sim_hash(d1)
-    # hash2 = sim_hash(d2)
+    d1 = {"high":1, "low":1, "begging":1}
+    d2 = {"high":6, "low":20, "begging":1}
+    hash1 = sim_hash(d1)
+    hash2 = sim_hash(d2)
     
-    # print(hash1,hash2)
-    # print(compute_sim_hash_similarity(hash1, hash2))
+    print(hash1,hash2)
+    print(compute_sim_hash_similarity(hash1, hash2))
+
+    # Test simhashing with bigrams
 
     # sample = '''In the heart of the ancient forest, where the canopy was so thick that sunlight barely touched the ground, lived a girl named Elara. 
     # She had grown up among the towering trees and whispering leaves, her only companions the creatures of the wood and the distant echo of her mother's 
