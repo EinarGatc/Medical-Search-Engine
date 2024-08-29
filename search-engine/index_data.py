@@ -1,4 +1,4 @@
-from SearchEngine.posting import decode_posting_list, print_posting, PostingList
+from posting import decode_posting_list, print_posting, PostingList
 import json
 
 def get_query_postings(filepath, queries):

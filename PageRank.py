@@ -4,10 +4,12 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse, urlunparse
 import scipy.sparse as sp
 import numpy as np
+
 linkCount = 0
 adjacencyList = defaultdict(list)
 visited = set()
-docs = dict()
+docs = dict() # maps url to documentID
+documents = dict()
 
 def CreateAdjacencyList(folderPath, adjListFolderPath, restrictDocs = True, maxDocs = 10000, maxSize = 1000000):
     clearFolder(adjListFolderPath)
@@ -25,7 +27,8 @@ def CreateAdjacencyList(folderPath, adjListFolderPath, restrictDocs = True, maxD
 
             if url not in docs:
                 docs[url] = len(docs)
-            
+
+            documents[docs[url]] = len(documents)
             adjacentLinks = GetUrls(url, text)
             
             for link in adjacentLinks:
@@ -37,11 +40,20 @@ def CreateAdjacencyList(folderPath, adjListFolderPath, restrictDocs = True, maxD
             OffloadAdjacencyList(offloadCount, adjListFolderPath)
             adjacencyList.clear()
             offloadCount += 1 
+        
     
     OffloadAdjacencyList(offloadCount, adjListFolderPath)
     adjacencyList.clear()
     offloadCount += 1 
     CombineAdjacencyLists(adjListFolderPath, offloadCount)
+    SaveDocUrlToDocID(adjListFolderPath)
+    
+
+def SaveDocUrlToDocID(adjListFolderPath):
+    filePath = os.path.join(adjListFolderPath, f"urlToDocID.txt")
+    with open(filePath, "w+") as f:
+        for k, v in docs.items():
+            f.write(f"{k}:{v}\n")
 
 def OffloadAdjacencyList(offloadCount, folderPath):
     if not os.path.exists(folderPath):
@@ -228,8 +240,8 @@ def clearFolder(folderPath):
 
 def SavePageRank(pageRankScores, filePath):
     with open(filePath, "w+") as f:
-        for v in pageRankScores:
-            f.write(f"{v}\n")
+        for k, v in documents.items():
+            f.write(f"{v+1}:{pageRankScores[k]}\n")
 
 def CreatePageRank(folderPathDocs, folderPathAdjList, filePathPRS):
     CreateAdjacencyList(folderPathDocs, folderPathAdjList, filePathPRS)

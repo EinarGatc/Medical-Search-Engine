@@ -9,9 +9,12 @@ from chunker import chunk_index
 from bs4 import BeautifulSoup
 from simhashing import sim_hash, compute_sim_hash_similarity
 import time
+from collections import defaultdict
+import math
+
 id_to_document = dict()
 content_hashes = set()
-
+id_normalize_tfidf = defaultdict(float)
 # returns list of batches
 def get_batches(documents, num_batches = 3):
     '''Splits documents into separate batches equally.'''
@@ -59,13 +62,13 @@ def build_index(documents, batch_size):
             stemmed_tokens = get_tokens_without_tags(text)
             tokens_dict = compute_token_frequencies2(stemmed_tokens)
             
-            hash_vector = sim_hash(tokens_dict)
-            if not check_content(hash_vector, similarity_threshold=60): # content unique get links
-                continue
+            # hash_vector = sim_hash(tokens_dict)
+            # if not check_content(hash_vector, similarity_threshold=60): # content unique get links
+            #     continue
             
-            id_to_document[n] = d 
+            id_to_document[n] = d
             index_urls[n] = data["url"]
-            content_hashes.add(hash_vector)
+            # content_hashes.add(hash_vector)
 
             stemmed_token_tags_dict = get_tokens_with_tags(text)
             stemmed_tokens = compute_token_frequencies(stemmed_tokens)
@@ -89,7 +92,7 @@ def build_index(documents, batch_size):
         chunk += 1
     
     merge_indexes(chunk-1, len(documents))
-    
+    get_tfidf()
     # return index
 
 def build_index2(documents):
@@ -191,7 +194,7 @@ def index_chunker(index) -> int:
     chunk_size = int(get_size_of_index(index)/3) + 1
     return chunk_size
 
-def write_tf_idf(file, file2, c_seek, file_out, len_of_docs, r = 10000):
+def write_tf_idf(file, file_out, len_of_docs, r = 10000):
     '''Adds a TF-IDF score to our index for efficiency.'''
     file_out.seek(0)
     value = file_out.readline()
@@ -205,32 +208,14 @@ def write_tf_idf(file, file2, c_seek, file_out, len_of_docs, r = 10000):
     file.write(f"{token}: ")
     for posting in postings_list.get():
         tf = 1 + log(posting.frequency)
-        idf = log(len_of_docs/len_of_postings)
+        idf = log(len_of_docs/float(len_of_postings))
         tf_idf = tf * idf
         posting.tf_idf = tf_idf
         new_list.append(posting)
         file.write(encode_posting(posting))
+        id_normalize_tfidf[posting.d_id-1] += tf_idf**2
+        
     file.write("\n")
-
-    c_seek.write(f"{token}:{c_seek.tell()}\n")
-
-    file2.write(f"{token}:")
-    sorted_list = sorted(new_list, key=lambda obj: obj.tf_idf, reverse=True)
-    c_list = []
-    count = 0
-
-    while count < len(sorted_list) and count < r:
-        c_list.append(sorted_list[count])
-        count += 1
-    c_list = sorted(c_list, key=lambda obj: obj.d_id)
-
-    for posting in c_list:
-        tf = 1 + log(posting.frequency)
-        idf = log(len_of_docs/len_of_postings)
-        tf_idf = tf * idf
-        posting.tf_idf = tf_idf
-        file2.write(encode_posting(posting))
-    file2.write("\n")
 
 def merge_indexes(batches, len_of_docs) -> None:
     '''Merges all our .txt files (or partial indexes) into one file called index.txt.'''
@@ -251,61 +236,51 @@ def merge_indexes(batches, len_of_docs) -> None:
         token = line[0]
         posting_list = line[1]
         list_of_tokens.append((token,posting_list))
-    
-    with open('chamption_seek', "a+") as c_seek:
-        with open('champion_index', 'a+') as c_file:
-            with open('index_seek.txt', 'a+') as seek_file:
-                with open('index.txt', 'a+') as file:
-                    with open('entry.txt', 'w+') as file_out:
-                        c_file.seek(0)
-                        c_file.truncate()
 
-                        file.seek(0)
-                        file.truncate()
+    with open('index.txt', 'a+') as file:
+        with open('entry.txt', 'w+') as file_out:
 
+            file.seek(0)
+            file.truncate()
+
+            file_out.seek(0)
+            file_out.truncate()
+
+            last_token = None
+
+            while(list_of_files):
+                current_position = file_out.tell()
+                min_token, min_index = list_of_tokens[0], 0 #get the next token to be added
+                length = len(list_of_tokens)
+
+                for i in range(1, length):
+                    value = list_of_tokens[i]
+                    if value[0] < min_token[0]:
+                        min_token, min_index = value, i  
+                
+                if last_token and last_token == min_token[0]: # same token
+                    file_out.seek(current_position-1)
+                    file_out.write(min_token[1].strip())
+                else: # new token
+                    if last_token:
+                        write_tf_idf(file, file_out, len_of_docs, 2)
                         file_out.seek(0)
                         file_out.truncate()
+                    entry = f"{min_token[0]}: {min_token[1].strip()}\n"
+                    file_out.write(entry) # write the new entry
+                
+                last_token = min_token[0]
+                value = list_of_files[min_index].readline()
 
-                        seek_file.seek(0)
-                        seek_file.truncate(0)
-
-
-                        last_token = None
-
-                        while(list_of_files):
-                            current_position = file_out.tell()
-                            min_token, min_index = list_of_tokens[0], 0
-                            length = len(list_of_tokens)
-
-                            for i in range(1, length):
-                                value = list_of_tokens[i]
-                                if value[0] < min_token[0]:
-                                    min_token, min_index = value, i  
-                            
-                            if last_token and last_token == min_token[0]: # same token
-                                file_out.seek(current_position-1)
-                                file_out.write(min_token[1].strip())
-                            else: # new token
-                                if last_token:
-                                    seek_file.write(f"{last_token}: {file.tell()}\n")
-                                    write_tf_idf(file, c_file, c_seek, file_out, len_of_docs, 2)
-                                    file_out.seek(0)
-                                    file_out.truncate()
-                                entry = f"{min_token[0]}: {min_token[1].strip()}\n"
-                                file_out.write(entry) # write the new entry
-                            
-                            last_token = min_token[0]
-                            value = list_of_files[min_index].readline()
-
-                            if value == "":
-                                list_of_tokens.pop(min_index)
-                                list_of_files[min_index].close()
-                                list_of_files.pop(min_index)
-                            else:
-                                line = value.split(":",1)
-                                token = line[0]
-                                posting_list = line[1]
-                                list_of_tokens[min_index] = (token, posting_list)
+                if value == "":
+                    list_of_tokens.pop(min_index)
+                    list_of_files[min_index].close()
+                    list_of_files.pop(min_index)
+                else:
+                    line = value.split(":",1)
+                    token = line[0]
+                    posting_list = line[1]
+                    list_of_tokens[min_index] = (token, posting_list)
         
     with open("index_list.txt", "a+") as f:
         f.seek(0)
@@ -333,7 +308,34 @@ def merge_indexes(batches, len_of_docs) -> None:
                 count += 1
             file.close()
 
+def get_tfidf():
+    indexFile =  open('index.txt', 'r+')
+    seekFile = open('indexFinalSeek.txt', 'w+') 
+    newIndexFile = open('indexFinal.txt', 'w+')
+    
+    for k, v in id_normalize_tfidf.items():
+        id_normalize_tfidf[k] = math.sqrt(v)
+    
+    line = indexFile.readline()
+    while line:
+        data = line.split(':', 1)
+        token, tokenPostings = data[0], decode_posting_list(data[1])
+
+        seekFile.write(f"{token}: {newIndexFile.tell()}\n") # writes the byte to seek to
+        newIndexFile.write(f"{token}: ")
+        for posting in tokenPostings.get():
+            if id_normalize_tfidf[posting.d_id] != 0.0:
+                posting.tf_idf /= id_normalize_tfidf[posting.d_id]
+            
+            newIndexFile.write(encode_posting(posting))
+        newIndexFile.write("\n")
         
+        line = indexFile.readline()
+    
+    indexFile.close()
+    seekFile.close()
+    newIndexFile.close()
+            
 def convert_seek_into_dict():
     '''Gathers information from the index_seek.txt file and returns that as a dictionary.'''
     result = dict()
@@ -349,7 +351,7 @@ def convert_seek_into_dict():
 
 
 if __name__ == "__main__":
-    documents = get_documents("/Users/egatchal/Desktop/Assignments/CS121/DEV", True, 100) # For Pookiebear
+    documents = get_documents("/Users/egatchal/Medical-Search-Engine/crawler/CDC_Documents", False, 10) # For Pookiebear
     # documents = get_documents("/Users/shika/Desktop/DEV", False) # For Jeff
     # documents = get_documents("/Users/hearty/Assignment3_CS_121/Assignment3/DEV", True) # harpy
     starttime = time.time()

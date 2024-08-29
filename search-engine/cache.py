@@ -1,5 +1,5 @@
 from collections import defaultdict
-import SearchEngine.posting as posting
+import posting as posting
 class Cache:
     def __init__(self, max_size):
         self.max_size = max_size
