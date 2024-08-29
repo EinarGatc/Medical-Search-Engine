@@ -1,6 +1,8 @@
 from hashlib import md5
 # from zlib import crc32
 
+# from parse import parse_document, compute_token_frequencies
+
 def sim_hash(frequencies):
     """Compute a similarity hash for the passed in dict.
     
@@ -74,10 +76,25 @@ def compute_sim_hash_similarity(vector1, vector2):
     return count
 
 if __name__ == "__main__":
-    d1 = {"high":1, "low":1, "begging":1}
-    d2 = {"high":6, "low":20, "begging":1}
-    hash1 = sim_hash(d1)
-    hash2 = sim_hash(d2)
+    # d1 = {"high":1, "low":1, "begging":1}
+    # d2 = {"high":6, "low":20, "begging":1}
+    # hash1 = sim_hash(d1)
+    # hash2 = sim_hash(d2)
     
-    print(hash1,hash2)
-    print(compute_sim_hash_similarity(hash1, hash2))
+    # print(hash1,hash2)
+    # print(compute_sim_hash_similarity(hash1, hash2))
+
+    # sample = '''In the heart of the ancient forest, where the canopy was so thick that sunlight barely touched the ground, lived a girl named Elara. 
+    # She had grown up among the towering trees and whispering leaves, her only companions the creatures of the wood and the distant echo of her mother's 
+    # lullabies. One evening, as the sky blazed with the colors of dusk, Elara stumbled upon a hidden glade. In its center stood a tree unlike any other, 
+    # its bark shimmering with an ethereal glow. Intrigued, she approached and found a small, intricately carved box nestled among its roots. As she opened it, 
+    # a soft, golden light enveloped her, and she heard a voice, gentle yet commanding, You have been chosen, Elara, to awaken the ancient guardians and restore 
+    # balance to our world. Thus began her journey, one that would take her far beyond the familiar confines of her forest home and into realms of magic and 
+    # danger she had never imagined.'''
+
+    # tokens = parse_document(sample)
+    # freqMap1 = compute_token_frequencies(tokens)
+    
+    # sim = sim_hash(freqMap1)
+    # print(sim)
+
