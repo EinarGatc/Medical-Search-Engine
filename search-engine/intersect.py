@@ -1,4 +1,4 @@
-from SearchEngine.posting import PostingList
+from posting import PostingList
 # input is a list of LISTS of doc_ids that different tokens appears in
 def intersect_query_terms(query_postings):
     '''Returns a set of documents that the query terms have in common.'''
@@ -7,8 +7,8 @@ def intersect_query_terms(query_postings):
         return result
 
     key_order = []
-    min_key = min(query_postings, key=lambda k: len(query_postings[k].get()))
-    min_list = [p for p in query_postings[min_key].get()] # list of postings
+    min_key = min(query_postings, key=lambda k: len(query_postings[k].get())) # finds key with the least number of postings
+    min_list = [p for p in query_postings[min_key].get()] # list of postings (# of postings is the smallest)
     key_order.append(min_key)
 
     for p in min_list:
@@ -17,19 +17,21 @@ def intersect_query_terms(query_postings):
         result[p.d_id].add(p)
 
     for k, v in query_postings.items():
+        copy = min_list[::]
         if k == min_key:
             continue
         
-        key_order.append(k)
-        result[k] = PostingList()
+        # key_order.append(k)
 
         posting_list = v.get()
   
         index1 = 0
         index2 = 0
 
+        # only look through ids in the min list
+        idsToPop = []
         while index1 < len(min_list) and index2 < len(posting_list):
-            id1 = min_list[index1].d_id
+            id1 = min_list[index1].d_id 
             id2 = posting_list[index2].d_id
             if id1 == id2:
                 result[id1].add(posting_list[index2])
@@ -37,13 +39,20 @@ def intersect_query_terms(query_postings):
                 index2 += 1
             elif id1 < id2:
                 min_list.pop(index1)
-                result.pop(id1)
+                idsToPop.append(id1)
             else:
                 index2 += 1
         
         while index1 < len(min_list):
             p = min_list.pop(index1)
-            result.pop(p.d_id)
+            idsToPop.append(p.d_id)
+        
+        if len(min_list) == 0: # do not delete anything (ensures result hopefully)
+            min_list = copy
+        else:
+            key_order.append(k)
+            for id in idsToPop:
+                result.pop(id)
     
     final_result = dict()
 
@@ -53,7 +62,7 @@ def intersect_query_terms(query_postings):
             if token not in final_result:
                 final_result[token] = PostingList()
             final_result[token].add(p)
-    
+
     return final_result
                 
 

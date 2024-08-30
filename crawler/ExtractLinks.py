@@ -27,11 +27,11 @@ def ExtractLinks(baseUrl, htmlString, visitedUrls):
 
     soup = BeautifulSoup(htmlString, 'html.parser')
     for tag in soup.find_all('a'): 
-      if tag.get('href'):
-        newLink = tag['href']
-        absoluteLink = CreateAbsoluteUrl(baseUrl, newLink)
-        if absoluteLink not in visitedUrls and absoluteLink not in newLinks: 
-          newLinks.append(absoluteLink)
+        if tag.get('href'):
+            newLink = tag['href']
+            absoluteLink = CreateAbsoluteUrl(baseUrl, newLink)
+            if absoluteLink not in visitedUrls and absoluteLink not in newLinks: 
+                newLinks.append(absoluteLink)
         
     return newLinks
     
@@ -69,9 +69,6 @@ def Normalize(url):
         parsed_url.query,  # keep the query part
         ''  # remove the fragment
     ))
-
-    if url.endswith('?') and not parsed_url.query:
-        normalized_url += '?'
     
     return normalized_url
 

@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from parse import tokenize
+from Parse import tokenize
 import requests
 import matplotlib.pyplot as plt
 import numpy as np

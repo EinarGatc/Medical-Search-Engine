@@ -21,7 +21,7 @@ def RetrieveUrlData(url : str) -> dict | int:
         the status of the data retrieval
     """
     try:
-        page = requests.get(url)
+        page = requests.get(url, timeout=1)
     except:
         return {}, 404
     
@@ -30,8 +30,7 @@ def RetrieveUrlData(url : str) -> dict | int:
     
     return {"url" : page.url, "content": page.content, "encoding" : page.encoding}, page.status_code
 
-
-def IsValid(url, validDomains) -> bool:
+def IsValid(url, validDomains, traps) -> bool:
     """Check if the URL is valid against the acceptable set of URL's.
 
     Parameters
@@ -63,8 +62,10 @@ def IsValid(url, validDomains) -> bool:
             return False
 
         repeatingDirs = r"^.*?(/.+?/).*?\1.*$|^.*?/(.+?/)\2.*$"
-        # if re.match(traps, url):
-        #     return False
+        
+        if re.match(traps, url):
+            return False
+        
         if re.match(repeatingDirs, url):
             return False
         
@@ -83,7 +84,7 @@ def IsValid(url, validDomains) -> bool:
         return False
 
 
-def SaveDocument(doc : dict) -> None:
+def SaveDocument(resp : dict, docNum : int) -> None:
     """Store the processed document in a database or file system.
     
     Parameters
@@ -95,23 +96,21 @@ def SaveDocument(doc : dict) -> None:
     -------
     None
     """
-    fileName = "Documents.json"
-    newJSON = []
+    fileName = f"document{docNum}.json"
+    folderPath = 'documents'
+    htmlContent = resp["content"].decode(resp["encoding"])
 
-    #Check if json file exists
-    try:
-        with open(fileName, "r") as file:
-            newJSON = json.load(file)
-    except:
-        with open(fileName, "w") as file:
-            file.write('[\n]')
+    jsonData = {'url': resp['url'], 
+                'content': htmlContent,
+                'encoding': resp['encoding']}
+    
+    if not os.path.exists(folderPath):
+        os.makedirs(folderPath)
+        
+    filePath = os.path.join(folderPath, fileName)
 
-    #Appends new data to json
-    newJSON.append(doc)
-
-    #Write to and format json
-    with open(fileName, "w") as file:
-        json.dump(newJSON, file, indent=4, separators=(',',': '))
+    with open(filePath, "w") as file:
+        json.dump(jsonData, file, indent=4)
 
 
 #This function is only used for testing purposes

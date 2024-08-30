@@ -2,26 +2,34 @@ import nltk
 import threading
 nltk.download('stopwords')
 from nltk.corpus import stopwords
-import SearchEngine.stemming as stemming
-from SearchEngine.index_data import get_query_postings, query_postings_to_id, get_files, get_urls
-from SearchEngine.intersect import intersect_query_terms
-from SearchEngine.posting import decode_posting_list
+import stemming as stemming
+from index_data import get_query_postings, query_postings_to_id, get_files, get_urls
+from intersect import intersect_query_terms
+from posting import decode_posting_list
+import stemming as stemming
+from index_data import get_query_postings, query_postings_to_id, get_files, get_urls
+from intersect import intersect_query_terms
+from posting import decode_posting_list
 import time
-from SearchEngine.cache import Cache, load_cache, save_cache
+from cache import Cache, load_cache, save_cache
+from cache import Cache, load_cache, save_cache
 
 # filepath1 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index.txt"
 # filepath2 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_urls.txt"
 # filepath3 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_seek.txt"
 # filepath4 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_list.txt"
 
-filepath1 = "/Users/egatchal/Desktop/Projects/index_data/index_SH/index.txt"
-filepath2 = "/Users/egatchal/Desktop/Projects/index_data/index_SH/index_urls.txt"
-filepath3 = "/Users/egatchal/Desktop/Projects/index_data/index_SH/index_seek.txt"
-filepath4 = "/Users/egatchal/Desktop/Projects/index_data/index_SH/index_list.txt"
+filepath1 = "/Users/egatchal/Medical-Search-Engine/search-engine/indexFinal.txt"
+filepath2 = "/Users/egatchal/Medical-Search-Engine/search-engine/index_urls.txt"
+filepath3 = "/Users/egatchal/Medical-Search-Engine/search-engine/indexFinalSeek.txt"
+filepath4 = "/Users/egatchal/Medical-Search-Engine/search-engine/index_list.txt"
+
+scoreWeights = {"TF-IDF": .5, "PR": .2, "TW": .1, "WP": .2}
 seek_lock = threading.Lock()
 query_lock = threading.Lock()
 query_postings = dict()
 query_cache = load_cache(500)
+
 
 def worker_thread_index_search(token, file_index, query_lock, seek_lock):
     '''Seeks for a token using the search_index_index function.'''
@@ -95,10 +103,22 @@ def convert_index_urls_into_dict():
             line = index_urls.readline()
     return result
 
+def convert_pagerank_into_dict():
+    d = {}
+    with open("/Users/egatchal/Medical-Search-Engine/PRS.txt", "r+") as f:
+        line = f.readline()
+        while line:
+            data = line.split(":", 1)
+            dID, page_rank = int(data[0]), float(data[1])
+            d[dID] = page_rank
+            line = f.readline()
+    return d
+
 # data that is small enough to store in memory
 index_index = convert_seek_into_dict()
 index_list = convert_index_list_into_dict()
 index_urls = convert_index_urls_into_dict()
+page_rank = convert_pagerank_into_dict()
 stop_words = set(stopwords.words("english"))
 
 def remove_stopwords(query) -> list:
@@ -142,7 +162,6 @@ def start_query(query, index_file):
     return result
 
 def find_query(query, index_file):
-    print(query)
     '''Gathers and returns the intersecting URLs from the query tokens.'''
     starttime = time.time()
     trimmed_query  = process_query(query)
@@ -238,9 +257,9 @@ def get_query_score(query_list, query_postings) -> list:
 
                 tf_idf = post.tf_idf
                 freq = query_freq[term]
-                weight = tag_to_weight(post.fields)
+                tag_weight = tag_to_weight(post.fields)
                 pos_weight = pos_to_weight(post.positions)
-                scores[post.d_id] += tf_idf * freq + weight + pos_weight
+                scores[post.d_id] += scoreWeights["TF-IDF"] * tf_idf  + scoreWeights["PR"] * page_rank[post.d_id] + scoreWeights["TW"] * tag_weight + scoreWeights["WP"] * pos_weight
                 lengths[post.d_id] += 1
            
     for k, v in scores.items():
@@ -282,12 +301,11 @@ def tag_to_weight(tag_set) -> float:
         'b':0.8
     }
     
-    value = 0
+    maxValue = 0
     for tag in tag_set:
-        value += tag_weights.get(tag, 0.0)
+        maxValue = max(maxValue, tag_weights[tag])
 
-    normalized_score = value / len(tag_set)
-    return normalized_score
+    return maxValue
 
 def cosine_sim_score(query_len, post, value) -> float:
     '''Calculates a weight score to use for ranking intersecting pages.'''
@@ -303,6 +321,7 @@ if __name__ == "__main__":
         while query.strip() != "q":  # Check if input is empty or only whitespace
             starttime = time.time()
             urls = find_query(query, f1)
+            print_top5_urls(urls)
             endtime = time.time()
             print(f"Time: {endtime-starttime}, Size: {len(urls)}")
             

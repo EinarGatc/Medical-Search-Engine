@@ -1,0 +1,5 @@
+.DS_Store
+crawler/CDC_Documents
+*.pyc
+*.txt
+*.pkl
