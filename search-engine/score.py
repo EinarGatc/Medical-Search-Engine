@@ -65,12 +65,13 @@ def SearchScore(trimmedQuery, queryIntersection):
     threads = []
     for doc in queryPositions:
         arr = queryPositions[doc]
-        thread = threading.Thread(target=GetPhraseScore, args=[doc,arr,query_lock])
-        thread.start()
-        threads.append(thread)
+        GetPhraseScore(doc,arr,query_lock)
+        # thread = threading.Thread(target=GetPhraseScore, args=[doc,arr,query_lock])
+        # thread.start()
+        # threads.append(thread)
 
-    for thread in threads:
-        thread.join()
+    # for thread in threads:
+    #     thread.join()
     return documentScore
 
 def FindDistanceAscending(num, arr):
@@ -129,25 +130,25 @@ if __name__ == "__main__":
     query_postings["a"] = PostingList()
     query_postings["l"] = PostingList()
     
-    # for i in range(1):
-    #     query_postings["d"].add(Posting(i,3,None,[1,3,5]))
-    #     query_postings["a"].add(Posting(i,3,None,[2,4,9]))
-    #     query_postings["l"].add(Posting(i,3,None,[6,7,10]))
+    for i in range(200000):
+        query_postings["d"].add(Posting(i,3,None,[1,3,5]))
+        query_postings["a"].add(Posting(i,3,None,[2,4,9]))
+        query_postings["l"].add(Posting(i,3,None,[6,7,10]))
     
-    query_postings["d"].add(Posting(0,3,None,[1,3,5]))
-    query_postings["a"].add(Posting(0,3,None,[2,4,9]))
-    query_postings["l"].add(Posting(0,3,None,[6,7,10]))
+    # query_postings["d"].add(Posting(0,3,None,[1,3,5]))
+    # query_postings["a"].add(Posting(0,3,None,[2,4,9]))
+    # query_postings["l"].add(Posting(0,3,None,[6,7,10]))
 
-    query_postings["d"].add(Posting(1,3,None,[1,4,10]))
-    query_postings["a"].add(Posting(1,3,None,[2,8,12]))
-    query_postings["l"].add(Posting(1,3,None,[3,9,13]))
+    # query_postings["d"].add(Posting(1,3,None,[1,4,10]))
+    # query_postings["a"].add(Posting(1,3,None,[2,8,12]))
+    # query_postings["l"].add(Posting(1,3,None,[3,9,13]))
 
-    query_postings["d"].add(Posting(2,3,None,[1,56,101]))
-    query_postings["a"].add(Posting(2,3,None,[2,57,102]))
-    query_postings["l"].add(Posting(2,3,None,[3,58,103]))
+    # query_postings["d"].add(Posting(2,3,None,[1,56,101]))
+    # query_postings["a"].add(Posting(2,3,None,[2,57,102]))
+    # query_postings["l"].add(Posting(2,3,None,[3,58,103]))
 
     query_intersection = intersect_query_terms(query_postings)
     start = time.time()
     scores = SearchScore(["d","a","l"],query_intersection)
-    print(scores)
     print(time.time()-start)
+    # print(scores)
