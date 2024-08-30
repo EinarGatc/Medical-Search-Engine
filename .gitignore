@@ -3,3 +3,4 @@ crawler/CDC_Documents
 *.pyc
 *.txt
 *.pkl
+developer/*

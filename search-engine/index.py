@@ -39,12 +39,6 @@ def build_index(documents, batch_size):
     id_to_document = dict()
     index = dict()
     index_urls = dict()
-                                                        
-    # get batch of documents
-        # check if batch is empty if true then exit
-        # run parser and stemmer
-    # If batch is finished save the chunk
-    # create final index
     
     # 1. get a batch of documents
     # 2. parse and stem batch, and add into index
@@ -60,7 +54,7 @@ def build_index(documents, batch_size):
             text = BeautifulSoup(data["content"], "html.parser")
             
             stemmed_tokens = get_tokens_without_tags(text)
-            tokens_dict = compute_token_frequencies2(stemmed_tokens)
+            # tokens_dict = compute_token_frequencies2(stemmed_tokens)
             
             # hash_vector = sim_hash(tokens_dict)
             # if not check_content(hash_vector, similarity_threshold=60): # content unique get links
@@ -353,12 +347,16 @@ def convert_seek_into_dict():
 if __name__ == "__main__":
     documents = get_documents("/Users/egatchal/Medical-Search-Engine/crawler/CDC_Documents", False, 10) # For Pookiebear
     # documents = get_documents("/Users/shika/Desktop/DEV", False) # For Jeff
-    # documents = get_documents("/Users/hearty/Assignment3_CS_121/Assignment3/DEV", True) # harpy
-    starttime = time.time()
-    build_index(documents, 4)
-    endtime = time.time()
-    print(f"Time: {endtime-starttime}")
-    print("END")
+    # documents = get_documents("Medical-Search-Engine\developer", True) # harpy
+
+    index = build_index(documents, 10)
+    # save_index(index)
+
+    # starttime = time.time()
+    # build_index(documents, 4)
+    # endtime = time.time()
+    # print(f"Time: {endtime-starttime}")
+    # print("END")
 
     # result = binary_search(["software", "machine", "0"])
     # print("print result", result)

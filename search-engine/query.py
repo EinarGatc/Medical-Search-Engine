@@ -163,9 +163,10 @@ def start_query(query, index_file):
 
 def find_query(query, index_file):
     '''Gathers and returns the intersecting URLs from the query tokens.'''
+    
     starttime = time.time()
     trimmed_query  = process_query(query)
-    
+    add_bigrams_trigrams(trimmed_query)
     # print(f"P1 Time: {time.time()-starttime}")
     # perform_binary_search_on_query(trimmed_query, index_file)
     perform_index_search_on_query(trimmed_query, index_file)
@@ -182,6 +183,15 @@ def find_query(query, index_file):
     # urls = get_top5_urls(urls)
 
     return urls
+
+def add_bigrams_trigrams(trimmed_query):
+    newTokens = []
+    for tokens in nltk.bigrams(trimmed_query):
+        newTokens.append(" ".join(tokens))
+    for tokens in nltk.trigrams(trimmed_query):
+        newTokens.append(" ".join(tokens))
+    for newToken in newTokens:
+        trimmed_query.append(newToken)
 
 def convert_seek_into_dict():
     '''Gathers index_seek.txt information and returns it as a dictionary.'''
