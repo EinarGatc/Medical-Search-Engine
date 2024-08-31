@@ -34,23 +34,23 @@ def parse_document(text):
         tokens.append(token)
 
     # generate a list of bigrams (in tuple form by default)
-    textBigrams = list(nltk.bigrams(tokens))
+    # textBigrams = list(nltk.bigrams(tokens))
 
-    textTrigrams = list(nltk.trigrams(tokens))
+    # textTrigrams = list(nltk.trigrams(tokens))
 
-    gramList = []
+    # gramList = []
 
-    for tuple in textBigrams: # change tuples into string
-        bigramStr = " ".join(tuple)
-        gramList.append(bigramStr)
+    # for tuple in textBigrams: # change tuples into string
+    #     bigramStr = " ".join(tuple)
+    #     gramList.append(bigramStr)
 
-    for tuple in textTrigrams:
-        trigramStr = " ".join(tuple)
-        gramList.append(trigramStr)
+    # for tuple in textTrigrams:
+    #     trigramStr = " ".join(tuple)
+    #     gramList.append(trigramStr)
         
     
-    # add bigrams to current list of tokens
-    tokens.extend(gramList)
+    # # add bigrams to current list of tokens
+    # tokens.extend(gramList)
 
     return tokens
 
@@ -74,15 +74,50 @@ def compute_token_frequencies(tokens):
     frequencies = dict()
     token_pos = 0
 
-    for token in tokens:
+    for i, token in enumerate(tokens):
         if token in frequencies:
             frequencies[token][0] += 1
         else: # token does not exist
             frequencies[token] = [1, list()] # set token count equal to 1
         frequencies[token][1].append(token_pos)
+
+        if i < len(tokens)-1:
+            token = token + " " + tokens[i+1]
+            if token in frequencies:
+                frequencies[token][0] += 1
+            else: # token does not exist
+                frequencies[token] = [1, list()] # set token count equal to 1
+            frequencies[token][1].append(token_pos)
+
+        if i < len(tokens)-2:
+            token = token + " " + tokens[i+2]
+            if token in frequencies:
+                frequencies[token][0] += 1
+            else: # token does not exist
+                frequencies[token] = [1, list()] # set token count equal to 1
+            frequencies[token][1].append(token_pos)
+            
         token_pos += 1
     
     return frequencies
+
+def add_bigrams_trigrams(tokens):
+    textBigrams = list(nltk.bigrams(tokens))
+
+    textTrigrams = list(nltk.trigrams(tokens))
+
+    gramList = []
+
+    for tuple in textBigrams: # change tuples into string
+        bigramStr = " ".join(tuple)
+        gramList.append(bigramStr)
+
+    for tuple in textTrigrams:
+        trigramStr = " ".join(tuple)
+        gramList.append(trigramStr)
+        
+    # add bigrams to current list of tokens
+    tokens.extend(gramList)
 
 def compute_token_frequencies2(tokens):
     """Computes the frequency of tokens

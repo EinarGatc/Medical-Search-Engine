@@ -6,14 +6,9 @@ import stemming as stemming
 from index_data import get_query_postings, query_postings_to_id, get_files, get_urls
 from intersect import intersect_query_terms
 from posting import decode_posting_list
-import stemming as stemming
-from index_data import get_query_postings, query_postings_to_id, get_files, get_urls
-from intersect import intersect_query_terms
-from posting import decode_posting_list
+from cache import Cache, load_cache, save_cache
+from score import SearchScore
 import time
-from cache import Cache, load_cache, save_cache
-from cache import Cache, load_cache, save_cache
-
 # filepath1 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index.txt"
 # filepath2 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_urls.txt"
 # filepath3 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_seek.txt"
@@ -24,7 +19,7 @@ filepath2 = "/Users/egatchal/Medical-Search-Engine/search-engine/index_urls.txt"
 filepath3 = "/Users/egatchal/Medical-Search-Engine/search-engine/indexFinalSeek.txt"
 filepath4 = "/Users/egatchal/Medical-Search-Engine/search-engine/index_list.txt"
 
-scoreWeights = {"TF-IDF": .5, "PR": .2, "TW": .1, "WP": .2}
+scoreWeights = {"TF-IDF": .5, "PR": .2, "TW": .1, "WP": .1, "PS": .1}
 seek_lock = threading.Lock()
 query_lock = threading.Lock()
 query_postings = dict()
@@ -253,6 +248,7 @@ def get_query_score(query_list, query_postings) -> list:
     '''Returns a total query score from the intersecting pages of the query tokens.\n
     (based on token occurrence and total size of the indexer)
     '''
+    proximityScore = SearchScore(query_postings)
     scores = dict()
     lengths = dict()
     query_freq = to_dict(query_list)
@@ -269,7 +265,7 @@ def get_query_score(query_list, query_postings) -> list:
                 freq = query_freq[term]
                 tag_weight = tag_to_weight(post.fields)
                 pos_weight = pos_to_weight(post.positions)
-                scores[post.d_id] += scoreWeights["TF-IDF"] * tf_idf  + scoreWeights["PR"] * page_rank[post.d_id] + scoreWeights["TW"] * tag_weight + scoreWeights["WP"] * pos_weight
+                scores[post.d_id] += scoreWeights["TF-IDF"] * tf_idf  + scoreWeights["PR"] * page_rank[post.d_id] + scoreWeights["TW"] * tag_weight + scoreWeights["WP"] * pos_weight + scoreWeights["PS"] * proximityScore[post.d_id]
                 lengths[post.d_id] += 1
            
     for k, v in scores.items():

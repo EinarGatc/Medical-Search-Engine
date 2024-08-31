@@ -12,7 +12,6 @@ def intersect_query_terms(query_postings):
     key_order.append(min_key)
 
     for p in min_list:
-        if (p.d_id == 37092): print("TRUE")
         result[p.d_id] = PostingList()
         result[p.d_id].add(p)
 

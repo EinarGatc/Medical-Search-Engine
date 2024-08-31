@@ -8,6 +8,7 @@ from posting import Posting, PostingList
 documentScore = dict()
 query_lock = threading.Lock()
 
+
 def GetProximityScore(doc,arr,lock):
     a = []
     for i in range(len(arr)-1):
@@ -16,6 +17,11 @@ def GetProximityScore(doc,arr,lock):
             n.append(FindDistanceAscending(j,arr[i+1]))
         a.append(n)
 
+    if len(a) == 0:
+        with lock:
+            documentScore[doc] = 0
+        return
+            
     scores = []
     for i in range(len(a[0])):
         n = i
@@ -24,8 +30,9 @@ def GetProximityScore(doc,arr,lock):
             score += a[j][n][0]
             n = a[j][n][1]
         scores.append(score)
+    
     with lock:
-        documentScore[doc] = min(scores)**-1
+        documentScore[doc] = (min(scores)**-1)*(len(arr)-1)
 
 def GetPhraseScore(doc,arr,lock):
     last = set()
@@ -52,21 +59,21 @@ def GetPhraseScore(doc,arr,lock):
     with lock:
         documentScore[doc] = score
 
-def SearchScore(trimmedQuery, queryIntersection):
+def SearchScore(queryIntersection):
+    documentScore.clear()
     queryPositions = dict()
-    for term in trimmedQuery:
-        if term in queryIntersection:
-            postings = queryIntersection[term].get()
-            for post in postings:
-                if post.d_id not in documentScore:
-                    queryPositions[post.d_id] = []
-                    documentScore[post.d_id] = 0 
-                queryPositions[post.d_id].append(post.positions)
-    threads = []
+    for term in queryIntersection:
+        postings = queryIntersection[term].get()
+        for post in postings:
+            if post.d_id not in documentScore:
+                queryPositions[post.d_id] = []
+                documentScore[post.d_id] = 0 
+            queryPositions[post.d_id].append(post.positions)
+    # threads = []
     for doc in queryPositions:
         arr = queryPositions[doc]
-        GetPhraseScore(doc,arr,query_lock)
-        # thread = threading.Thread(target=GetPhraseScore, args=[doc,arr,query_lock])
+        GetProximityScore(doc,arr,query_lock)
+        # thread = threading.Thread(target=GetProximityScore, args=(doc,arr,query_lock))
         # thread.start()
         # threads.append(thread)
 
@@ -127,13 +134,13 @@ def FindDistanceDescending(num, arr):
 if __name__ == "__main__":
     query_postings = dict()
     query_postings["d"] = PostingList()
-    query_postings["a"] = PostingList()
-    query_postings["l"] = PostingList()
+    # query_postings["a"] = PostingList()
+    # query_postings["l"] = PostingList()
     
-    for i in range(200000):
+    for i in range(100):
         query_postings["d"].add(Posting(i,3,None,[1,3,5]))
-        query_postings["a"].add(Posting(i,3,None,[2,4,9]))
-        query_postings["l"].add(Posting(i,3,None,[6,7,10]))
+        # query_postings["a"].add(Posting(i,3,None,[2,4,9]))
+        # query_postings["l"].add(Posting(i,3,None,[6,7,10]))
     
     # query_postings["d"].add(Posting(0,3,None,[1,3,5]))
     # query_postings["a"].add(Posting(0,3,None,[2,4,9]))
@@ -148,7 +155,8 @@ if __name__ == "__main__":
     # query_postings["l"].add(Posting(2,3,None,[3,58,103]))
 
     query_intersection = intersect_query_terms(query_postings)
+    print(query_intersection)
     start = time.time()
-    scores = SearchScore(["d","a","l"],query_intersection)
+    scores = SearchScore(query_intersection)
     print(time.time()-start)
-    # print(scores)
+    print(scores)

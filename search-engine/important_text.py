@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import json
-from parse import parse_document
+from parse import parse_document, add_bigrams_trigrams
 import re
 import stemming
 
@@ -24,29 +24,27 @@ def get_token_count(list) -> dict:
 def get_tokens_with_tags(element):
     '''Gathers all tokens inside of a tag from the content passed in.'''
     result = dict()
-    stemmedToken = []
     
     for tag in element.find_all(["title", "header", "h1", "h2", "h3", "h4", "h5", "h6", "strong", "b",]):
         if tag.get_text().strip():
-            tokenList = parse_document(tag.get_text().strip().lower())
-            for tokenString in tokenList:
-                for token in tokenString.split(" "):
-                    stemmedToken.append(stemming.stem_token(token))
-                
-                newToken = " ".join(stemmedToken)
-                if newToken not in result:
-                    result[newToken] = set()
-                
-                result[newToken].add(tag.name)
-                stemmedToken.clear()
+            tokens = parse_document(tag.get_text().strip().lower())
+            for i, token in enumerate(tokens):
+                token = stemming.stem_token(token)
+                if token not in result:
+                    result[token] = set()
+                result[token].add(tag.name)
 
-        # if tag.get_text().strip():
-        #     tokens = parse_document(tag.get_text().strip().lower())
-        #     for token in tokens:
-        #         token = stemming.stem_token(token)
-        #         if token not in result:
-        #             result[token] = set()
-        #         result[token].add(tag.name)
+                if i < len(tokens)-1:
+                    token = token + " " + tokens[i+1]
+                    if token not in result:
+                        result[token] = set()
+                    result[token].add(tag.name)
+
+                if i < len(tokens)-2:
+                    token = token + " " + tokens[i+2]
+                    if token not in result:
+                        result[token] = set()
+                    result[token].add(tag.name)
                 
     return result
 
@@ -56,12 +54,8 @@ def get_tokens_without_tags(element):
     
     if element.get_text().strip():
         tokenList = parse_document(element.get_text().strip().lower())
-        stemmedToken = []
-        for tokenString in tokenList:
-            for token in tokenString.split(" "):
-                stemmedToken.append(stemming.stem_token(token))
-            result.append(" ".join(stemmedToken))
-            stemmedToken.clear()
+        for token in tokenList:
+            result.append(stemming.stem_token(token))
 
     return result
 
