@@ -14,10 +14,11 @@ import time
 # filepath3 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_seek.txt"
 # filepath4 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_list.txt"
 
-filepath1 = "/Users/egatchal/Medical-Search-Engine/search-engine/indexFinal.txt"
-filepath2 = "/Users/egatchal/Medical-Search-Engine/search-engine/index_urls.txt"
-filepath3 = "/Users/egatchal/Medical-Search-Engine/search-engine/indexFinalSeek.txt"
-filepath4 = "/Users/egatchal/Medical-Search-Engine/search-engine/index_list.txt"
+filepath1 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\indexFinal.txt"
+filepath2 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\index_urls.txt"
+filepath3 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\indexFinalSeek.txt"
+filepath4 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\index_list.txt"
+
 
 scoreWeights = {"TF-IDF": .5, "PR": .2, "TW": .1, "WP": .1, "PS": .1}
 seek_lock = threading.Lock()
@@ -100,7 +101,7 @@ def convert_index_urls_into_dict():
 
 def convert_pagerank_into_dict():
     d = {}
-    with open("/Users/egatchal/Medical-Search-Engine/PRS.txt", "r+") as f:
+    with open(r"c:\Users\Jason\Downloads\PRS.txt", "r+") as f:
         line = f.readline()
         while line:
             data = line.split(":", 1)

@@ -5,6 +5,7 @@
 body{
     font-family: "Rubik", sans-serif;
 }
+
 #home-page .section{
     padding: 3% var(--horizontal-padding);
 }

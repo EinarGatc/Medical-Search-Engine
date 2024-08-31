@@ -1,5 +1,6 @@
 #search-page{
-    display: grid;
+    display: flex;
+    flex-direction: column;
     background-color: var(--c3);
     min-height: 100vh;
 }
