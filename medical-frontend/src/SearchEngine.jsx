@@ -47,7 +47,7 @@ function SearchEngine() {
   const Summarize = (url) =>{
     const display = document.getElementById(encodeURIComponent(url))
     const btn = document.getElementById(encodeURIComponent(url)+"btn")
-    fetch('http://127.0.0.1:5000/api/summarize', {
+    fetch('http://127.0.0.1:5000/api/content', {
       method: 'POST',
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({"query": url})

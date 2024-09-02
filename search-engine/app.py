@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS, cross_origin
+import requests
 import query
 import threading
-#import llm
+import llm
 import json
 f1 = open(query.filepath1)
 
@@ -49,25 +50,18 @@ def UpdateCache():
 @app.route('/api/content', methods=["POST", "GET"])
 def GetHTMLContent():
     data = request.get_json()
-    documentID = int(data["id"])
-    documentPath = query.index_list[documentID]
-
-    with open(documentPath, 'r') as f:
-        jsonData = json.load(f)
-
-    return llm.Query(jsonData["content"])
+    try:
+        page = requests.get(data['url'],timeout=1)
+        return jsonify({'summary':llm.Summarize(page.content)})
+    except:
+        return jsonify({'summary':"Failed To Get Summary"})
 
 @app.route('/api/query', methods=["POST"])
 def AIOverview():
     data = request.get_json()
     field = data["query"]
-    return jsonify({'overview':"Loading AI Overview for: "+field})
+    return jsonify({'overview':llm.Query(field)})
 
-@app.route('/api/summarize', methods=["POST"])
-def PageSummary():
-    data = request.get_json()
-    field = data["query"]
-    return jsonify({'summary':"Loading Summary for: "+field})
 
 if __name__ == "__main__":
     app.run(debug=True)

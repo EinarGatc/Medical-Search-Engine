@@ -59,6 +59,8 @@
     border-radius: 25px;
     overflow-x: hidden;
     li{
+        display: flex;
+        flex-direction: column;
         position: relative;
         padding: 15px 0px;
         margin: 0px 5%;
@@ -89,8 +91,7 @@
 }
 
 .output {
-    outline: auto;
-    text-wrap: balance;
+    overflow-wrap: break-word;
 }
 
 #search-page #overview-container{
