@@ -1,6 +1,6 @@
 from langchain_ollama import OllamaLLM
 
-model = OllamaLLM(model="llama3")
+model = OllamaLLM(model="llama3.1")
 model.invoke(input="Your role is to teach users information regarding diseases. You will be given both questions to answer and documents to summarize. It is important to know that this should just be a recommendation.")
 
 def Query(text):
@@ -12,4 +12,8 @@ def Summarize(text):
     return model.invoke(input=prompt)
 
 if __name__ == "__main__":
-    print(Query("What are the symptoms of diabetes?"))
+    text = input("Query: ")
+    while text:
+        print(Query(text))
+        text = input("Query: ")
+    

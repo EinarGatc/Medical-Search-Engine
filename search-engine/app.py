@@ -26,8 +26,25 @@ def RetrieveRelevantUrls():
     data = request.get_json()
     field = data["query"]
     urls = query.find_query(field,f1)
-    query.query_postings.clear()
     return jsonify({'query':field,'urls':urls})
+
+@app.route('/api/cache', methods=["POST"])
+def UpdateCache():
+    """Updates the cache and clear query postings
+    
+    Parameters
+    ----------
+    None
+    
+    Returns
+    -------
+    None
+    """
+
+    for k, v in query.query_postings.items():
+        query.query_cache.put(k, v)
+    query.query_postings.clear()
+    return
 
 if __name__ == "__main__":
     app.run(debug=True)
