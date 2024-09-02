@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS, cross_origin
 import query
 import threading
-# import llm
-
+import llm
+import json
 f1 = open(query.filepath1)
 
 app = Flask(__name__,template_folder='../')
@@ -26,8 +26,36 @@ def RetrieveRelevantUrls():
     data = request.get_json()
     field = data["query"]
     urls = query.find_query(field,f1)
-    query.query_postings.clear()
     return jsonify({'query':field,'urls':urls})
+
+@app.route('/api/cache', methods=["POST"])
+def UpdateCache():
+    """Updates the cache and clear query postings
+    
+    Parameters
+    ----------
+    None
+    
+    Returns
+    -------
+    None
+    """
+
+    for k, v in query.query_postings.items():
+        query.query_cache.put(k, v)
+    query.query_postings.clear()
+    return
+
+@app.route('/api/content', methods=["POST", "GET"])
+def GetHTMLContent():
+    data = request.get_json()
+    documentID = int(data["id"])
+    documentPath = query.index_list[documentID]
+
+    with open(documentPath, 'r') as f:
+        jsonData = json.load(f)
+
+    return llm.Query(jsonData["content"])
 
 @app.route('/api/query', methods=["POST"])
 def AIOverview():

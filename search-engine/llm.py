@@ -1,18 +1,33 @@
 from langchain_ollama import OllamaLLM
+from langchain_core.prompts import ChatPromptTemplate
 
-model = OllamaLLM(model="llama3")
-model.invoke(input="Your role is to teach users information regarding diseases. You will be given both questions to answer and documents to summarize. It is important to know that this should just be a recommendation.")
+model = OllamaLLM(model="llama3.1")
 
 def Query(text):
-    prompt = f"I am giving you a query. Provide information on the query. Provide the definition of the disease, symptoms of the disease, and treatments for the disease. Query: {text}"
-    return model.invoke(input=prompt)
+    prompt = ChatPromptTemplate([
+        (
+            "system",
+            "You are search engine assistant that provides information regarding health. Provide the definition of the disease, symptoms of the disease, and treatments for the disease. It is important that your clarify that your answer is just a recommendation. Do not ask for any clarifications. Provide a clear break for each section, so that the text can be parsed easily."
+        ),
+        ("human", "{query}"),
+    ])
+    chain = prompt | model
+    return chain.invoke({"query":text})
 
 def Summarize(text):
-    prompt = f"You are being given a document. Summarize the document's content. Document Content: {text}"
-    return model.invoke(input=prompt)
+    prompt = ChatPromptTemplate([
+        (
+            "system",
+            "You are a document assistant that summarizes documents into their main points. Introduce the topic, discuss the main points, provide supporting arguments within the document, and conclude with a final point.Do not ask for any clarifications. Provide a clear break for each section, so that the text can be parsed easily."
+        ),
+        ("human", "{document}"),
+    ])
+    chain = prompt | model
+    return chain.invoke({"document": text})
 
 if __name__ == "__main__":
     text = input("Query: ")
     while text:
         print(Query(text))
         text = input("Query: ")
+    
