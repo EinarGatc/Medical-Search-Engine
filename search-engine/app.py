@@ -3,7 +3,7 @@ from flask_cors import CORS, cross_origin
 import query
 import threading
 import llm
-
+import json
 f1 = open(query.filepath1)
 
 app = Flask(__name__,template_folder='../')
@@ -46,5 +46,15 @@ def UpdateCache():
     query.query_postings.clear()
     return
 
+@app.route('/api/content', methods=["POST", "GET"])
+def GetHTMLContent():
+    data = request.get_json()
+    documentID = int(data["id"])
+    documentPath = query.index_list[documentID]
+
+    with open(documentPath, 'r') as f:
+        jsonData = json.load(f)
+
+    return llm.Query(jsonData["content"])
 if __name__ == "__main__":
     app.run(debug=True)
