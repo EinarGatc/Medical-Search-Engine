@@ -4,3 +4,5 @@ crawler/CDC_Documents
 *.txt
 *.pkl
 developer/*
+index-data.zip
+

@@ -9,18 +9,19 @@ from posting import decode_posting_list
 from cache import Cache, load_cache, save_cache
 from score import SearchScore
 import time
-# filepath1 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index.txt"
-# filepath2 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_urls.txt"
-# filepath3 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_seek.txt"
-# filepath4 = "/Users/egatchal/Desktop/Projects/index_data/index_NOSH/index_list.txt"
+filepath1 = "/Users/egatchal/Medical-Search-Engine/index-data/indexFinal.txt"
+filepath2 = "/Users/egatchal/Medical-Search-Engine/index-data/index_urls.txt"
+filepath3 = "/Users/egatchal/Medical-Search-Engine/index-data/indexFinalSeek.txt"
+filepath4 = "/Users/egatchal/Medical-Search-Engine/index-data/index_list.txt"
 
-filepath1 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\indexFinal.txt"
-filepath2 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\index_urls.txt"
-filepath3 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\indexFinalSeek.txt"
-filepath4 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\index_list.txt"
+# filepath1 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\indexFinal.txt"
+# filepath2 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\index_urls.txt"
+# filepath3 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\indexFinalSeek.txt"
+# filepath4 = r"C:\Users\Jason\Medical-Search-Engine\search-engine\index-data\index-data\index_list.txt"
 
 
-scoreWeights = {"TF-IDF": .5, "PR": .2, "TW": .1, "WP": .1, "PS": .1}
+# scoreWeights = {"TF-IDF": .5, "PR": .2, "TW": .1, "WP": .1, "PS": .1}
+scoreWeights = {"TF-IDF": .4, "PR": .2, "TW": .1, "WP": .2, "PS": .1}
 seek_lock = threading.Lock()
 query_lock = threading.Lock()
 query_postings = dict()
@@ -99,9 +100,9 @@ def convert_index_urls_into_dict():
             line = index_urls.readline()
     return result
 
-def convert_pagerank_into_dict():
+def convert_pagerank_into_dict(filename):
     d = {}
-    with open(r"c:\Users\Jason\Downloads\PRS.txt", "r+") as f:
+    with open(filename, "r+") as f:
         line = f.readline()
         while line:
             data = line.split(":", 1)
@@ -114,7 +115,7 @@ def convert_pagerank_into_dict():
 index_index = convert_seek_into_dict()
 index_list = convert_index_list_into_dict()
 index_urls = convert_index_urls_into_dict()
-page_rank = convert_pagerank_into_dict()
+page_rank = convert_pagerank_into_dict("/Users/egatchal/Medical-Search-Engine/PRS.txt")
 stop_words = set(stopwords.words("english"))
 
 def remove_stopwords(query) -> list:
