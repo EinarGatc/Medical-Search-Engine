@@ -45,7 +45,8 @@ function SearchEngine() {
   };
 
   const Summarize = (url) =>{
-    const btn = document.getElementById(encodeURIComponent(url))
+    const display = document.getElementById(encodeURIComponent(url))
+    const btn = document.getElementById(encodeURIComponent(url)+"btn")
     fetch('http://127.0.0.1:5000/api/summarize', {
       method: 'POST',
       headers: {"Content-Type": "application/json"},
@@ -55,13 +56,13 @@ function SearchEngine() {
         return res.json()
       }
     }).then((data)=>{
-      if(btn.childNodes[1].innerText != "v"){
-        btn.childNodes[1].innerText = "v"
-        btn.childNodes[0].innerText = ""
+      if(btn.innerText != "v"){
+        btn.innerText = "v"
+        display.innerText = ""
       }
       else{
-        btn.childNodes[0].innerText = data["summary"]
-        btn.childNodes[1].innerText = "^"
+        display.innerText = data["summary"]
+        btn.innerText = "^"
       }
     })
   }
@@ -84,12 +85,13 @@ function SearchEngine() {
                 const urlpath = "/search-engine/"+encodeURIComponent(url);
                 return(
                     <li>
-                      <Link to={url} target="_blank">
-                        {url}
-                      </Link>
-                      <div id = {encodeURIComponent(url)} class="output" onClick={() => Summarize(url)}>
-                        <div></div>
-                        <button>v</button>
+                      <div class="result">
+                          <Link to={url} target="_blank" class="url">
+                            {url}
+                          </Link>   
+                        <button id = {encodeURIComponent(url)+"btn"} onClick={() => Summarize(url)}>v</button>
+                      </div>
+                      <div id = {encodeURIComponent(url)} class="output">
                       </div>
                   </li>
                 )

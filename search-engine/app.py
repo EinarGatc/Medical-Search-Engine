@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS, cross_origin
 import query
 import threading
-import llm
+#import llm
 import json
 f1 = open(query.filepath1)
 
