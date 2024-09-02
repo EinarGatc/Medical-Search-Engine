@@ -12,4 +12,7 @@ def Summarize(text):
     return model.invoke(input=prompt)
 
 if __name__ == "__main__":
-    print(Query("What are the symptoms of diabetes?"))
+    text = input("Query: ")
+    while text:
+        print(Query(text))
+        text = input("Query: ")
