@@ -2,9 +2,9 @@ from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS, cross_origin
 import requests
 import query
-import threading
 import llm
-import json
+from parse import parse_document
+from bs4 import BeautifulSoup
 f1 = open(query.filepath1)
 
 app = Flask(__name__,template_folder='../')
@@ -50,9 +50,13 @@ def UpdateCache():
 @app.route('/api/content', methods=["POST", "GET"])
 def GetHTMLContent():
     data = request.get_json()
+
     try:
         page = requests.get(data['url'],timeout=1)
-        return jsonify({'summary':llm.Summarize(page.content)})
+        text = page.content.decode(page.encoding)
+        text = BeautifulSoup(text, "html.parser")
+        text = parse_document(text.get_text().strip().lower())
+        return jsonify({'summary':llm.Summarize(text)})
     except:
         return jsonify({'summary':"Failed To Get Summary"})
 
