@@ -23,7 +23,7 @@ function App() {
           <h1>HealthPro</h1>
           <h2>Medical Search Engine</h2>
           <p>Discover accurate and up-to-date health information with HealthPro Search Engine</p>
-          <button>Get Started</button>
+          <button><Link to="/search-engine">Get Started</Link></button>
         </section>
         <img src={medicalImage}></img>
       </div>

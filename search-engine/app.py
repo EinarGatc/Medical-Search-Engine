@@ -45,7 +45,7 @@ def UpdateCache():
     for k, v in query.query_postings.items():
         query.query_cache.put(k, v)
     query.query_postings.clear()
-    return
+    return jsonify({})
 
 @app.route('/api/content', methods=["POST", "GET"])
 def GetHTMLContent():
@@ -60,7 +60,10 @@ def GetHTMLContent():
 def AIOverview():
     data = request.get_json()
     field = data["query"]
-    return jsonify({'overview':llm.Query(field)})
+    try:
+        return jsonify({'overview':llm.Query(field)})
+    except:
+        return jsonify({'overview':"AI Overview not available"})
 
 
 if __name__ == "__main__":

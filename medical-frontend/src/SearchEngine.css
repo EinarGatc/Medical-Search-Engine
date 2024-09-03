@@ -79,6 +79,7 @@
 }
 
 .url{
+    font-weight: 500;
     overflow: hidden;
     text-wrap: nowrap;
 }
@@ -86,6 +87,10 @@
 .result{
     display: flex;
     button{
+        color: inherit;
+        background: 0;
+        border: 0;
+        font-size: large;
         margin-left: auto;
     }
 }
