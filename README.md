@@ -15,7 +15,7 @@ HealthPro Search Engine is a web-based platform that enables users to search for
   - Common cold
   - Respiratory diseases
   - Influenza
-- Retrieve links from trusted medical websites such as with AI generated summaries:
+- Retrieve links from specified medical websites with AI generated summaries:
   - [medlineplus.gov](https://medlineplus.gov)
   - [ncbi.nlm.nih.gov](https://ncbi.nlm.nih.gov)
   - [cdc.gov](https://cdc.gov)
